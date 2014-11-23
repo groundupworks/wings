@@ -1,0 +1,27 @@
+# Android Studio
+.idea/workspace.xml
+
+# gradle build
+**/build/
+.gradle
+
+# built application files
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+bin/
+gen/
+proguard/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Mac hidden files
+.DS_Store

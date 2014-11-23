@@ -1,0 +1,6 @@
+include ':wings'
+include ':wings-dropbox'
+include ':wings-facebook'
+include ':wings-gcp'
+include ':facebook'
+project(':facebook').projectDir = new File('wings-facebook/facebook')
