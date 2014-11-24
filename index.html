@@ -53,35 +53,71 @@
 
 <p>Clone the Wings source.</p>
 
-<div class="highlight highlight-bash"><pre>$ git clone https://github.com/groundupworks/wings.git</pre></div>
+<pre><code>$ git clone https://github.com/groundupworks/wings.git
+</code></pre>
 
 <p>Or if you use <a href="http://git-scm.com/book/en/v2/Git-Tools-Submodules">Submodules</a>, add Wings as a submodule to your project.</p>
 
-<div class="highlight highlight-bash"><pre>$ git submodule add https://github.com/groundupworks/wings.git</pre></div>
+<pre><code>$ git submodule add https://github.com/groundupworks/wings.git
+</code></pre>
 
 <p>Then from your project in Android Studio, <strong>Import Module...</strong> from the root <strong>wings</strong> folder, and you should see the list of all Wings modules. Select <strong>wings</strong> and the endpoints you want your application to share to. Complete the import, and your project's <strong>settings.gradle</strong> should now contain the Wings modules.</p>
 
 <p>Now you need to add these modules as dependencies in your application's <strong>build.gradle</strong>.</p>
 
-<div class="highlight highlight-groovy"><pre>dependencies {
-    compile project(<span class="pl-s1"><span class="pl-pds">'</span>:wings<span class="pl-pds">'</span></span>)
-    compile project(<span class="pl-s1"><span class="pl-pds">'</span>:wings-dropbox<span class="pl-pds">'</span></span>)     <span class="pl-c">// If applicable</span>
-    compile project(<span class="pl-s1"><span class="pl-pds">'</span>:wings-facebook<span class="pl-pds">'</span></span>)    <span class="pl-c">// If applicable</span>
-    compile project(<span class="pl-s1"><span class="pl-pds">'</span>:wings-gcp<span class="pl-pds">'</span></span>)         <span class="pl-c">// If applicable</span>
-}</pre></div>
+<pre><code>dependencies {
+    compile project(':wings')
+    compile project(':wings-dropbox')     // If applicable
+    compile project(':wings-facebook')    // If applicable
+    compile project(':wings-gcp')         // If applicable
+}
+</code></pre>
 
 <p>Rebuild your project, and say a prayer to the Gradle gods.</p>
 
 <h2>
 <a id="setting-up-the-endpoints" class="anchor" href="#setting-up-the-endpoints" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setting up the endpoints</h2>
 
-<p>You will find <strong>values/application.xml</strong> in some of the endpoint modules. This is where you will specify credentials and configurations specific to your application.</p>
+<p>You will find <strong>values/application.xml</strong> in some of the endpoint modules. This is where you specify credentials and configurations specific to your application. Take the Facebook endpoint for example, the following keys need to be overridden by your application.</p>
 
-<div class="highlight highlight-xml"><pre><span class="pl-c">&lt;!-- Your app id from Facebook --&gt;</span>
-&lt;<span class="pl-ent">string</span> <span class="pl-e">name</span>=<span class="pl-s1"><span class="pl-pds">"</span>facebook__app_id<span class="pl-pds">"</span></span>&gt;null&lt;/<span class="pl-ent">string</span>&gt;
+<pre><code>&lt;!-- Your app id from Facebook --&gt;
+&lt;string name="facebook__app_id"&gt;null&lt;/string&gt;
 
-<span class="pl-c">&lt;!-- The name of the default album to be created for storing photos --&gt;</span>
-&lt;<span class="pl-ent">string</span> <span class="pl-e">name</span>=<span class="pl-s1"><span class="pl-pds">"</span>facebook__app_album_default_name<span class="pl-pds">"</span></span>&gt;null&lt;/<span class="pl-ent">string</span>&gt;</pre></div>
+&lt;!-- The name of the default album to be created for storing photos --&gt;
+&lt;string name="facebook__app_album_default_name"&gt;null&lt;/string&gt;
+</code></pre>
+
+<p>You will need to sign up as a <a href="https://developers.facebook.com">Facebook Developer</a> and register your application to obtain an app ID, then map that value to a string resource in your application with the key <code>facebook__app_id</code>. The default album name will be overridden the same way. Note that the values you specify in your application will override the <code>null</code> specified in the library, so you should not directly modify <strong>application.xml</strong> in Wings.</p>
+
+<p>The Dropbox endpoint will be <a href="https://www.dropbox.com/developers">a similar story</a>. The integration instructions from the service providers may ask you to add stuff to your <strong>AndroidManifest.xml</strong>, you can skip that when using Wings, because the endpoint AAR will take care of that for you by merging its manifest. All you need to do is override the values in each <strong>application.xml</strong>.</p>
+
+<h2>
+<a id="using-the-wings-apis" class="anchor" href="#using-the-wings-apis" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the Wings APIs</h2>
+
+<h3>
+<a id="initializing-wings" class="anchor" href="#initializing-wings" aria-hidden="true"><span class="octicon octicon-link"></span></a>Initializing Wings</h3>
+
+<p>Wings need to be initialized in the <code>Application#onCreate()</code>.</p>
+
+<div class="highlight highlight-java"><pre><span class="pl-stj">IWingsModule</span> module <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">Wings</span>.<span class="pl-stj">DefaultModule</span>(<span class="pl-v">this</span>, looper, logger);
+<span class="pl-stj">Wings</span><span class="pl-k">.</span>init(module, <span class="pl-stj">FacebookEndpoint</span><span class="pl-k">.</span>class, <span class="pl-stj">DropboxEndpoint</span><span class="pl-k">.</span>class, <span class="pl-stj">GoogleCloudPrintEndpoint</span><span class="pl-k">.</span>class);</pre></div>
+
+<p>The <code>looper</code> is used to run background tasks and the <code>logger</code> implements <code>IWingsLogger</code>. All endpoint classes  used in your application should be passed to <code>Wings#init()</code>.</p>
+
+<h3>
+<a id="linking-user-accounts" class="anchor" href="#linking-user-accounts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Linking user accounts</h3>
+
+<p>To share to a user's account, the user will <em>link</em> with a sharing service, which means authenticating followed by authorizing the appropriate level of access, then specifying the destination for the shared content. All of this OAuth happiness, including UI, is handled by Wings. The application is responsible for initiating the linking process from an <code>Activity</code> or a <code>Fragment</code>, as in this Facebook example.</p>
+
+<pre><code>Wings.getEndpoint(FacebookEndpoint.class).startLinkRequest(activity, fragment);
+</code></pre>
+
+<p>In that same <code>Activity</code> or <code>Fragment</code>, the following must be called in the <code>onResume()</code> and <code>onActivityResult()</code>  for linking to complete.</p>
+
+<pre><code>Wings.getEndpoint(FacebookEndpoint.class).onResumeImpl();
+</code></pre>
+
+<div class="highlight highlight-java"><pre><span class="pl-stj">Wings</span><span class="pl-k">.</span>getEndpoint(<span class="pl-stj">FacebookEndpoint</span><span class="pl-k">.</span>class)<span class="pl-k">.</span>onActivityResultImpl(activity, fragment, requestCode, resultCode, data);</pre></div>
         </section>
 
         <footer>
