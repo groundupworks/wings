@@ -106,7 +106,7 @@ Wings.init(module, FacebookEndpoint.class, DropboxEndpoint.class, GoogleCloudPri
 <p>The <code>looper</code> is used to run background tasks and the <code>logger</code> implements <code>IWingsLogger</code>. All endpoint classes  used in your application should be passed to <code>Wings#init()</code>.</p>
 
 <h3>
-<a id="linking-user-accounts" class="anchor" href="#linking-user-accounts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Linking user accounts</h3>
+<a id="linking-a-user-account" class="anchor" href="#linking-a-user-account" aria-hidden="true"><span class="octicon octicon-link"></span></a>Linking a user account</h3>
 
 <p>To share to a user's account, the user will <em>link</em> with a sharing service, which means authenticating followed by authorizing the appropriate level of access, then specifying the destination for the shared content. All of this OAuth happiness, including UI, is handled by Wings. The application is responsible for initiating the linking process from an <code>Activity</code> or a <code>Fragment</code>, as in this Facebook example.</p>
 
@@ -124,9 +124,9 @@ Wings.init(module, FacebookEndpoint.class, DropboxEndpoint.class, GoogleCloudPri
 <h3>
 <a id="sharing-a-photo" class="anchor" href="#sharing-a-photo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sharing a photo</h3>
 
-<p>After confirming that <code>WingsEndpoint#isLinked()</code>, you want to start sharing photos to the endpoint. This is done by calling <code>Wings#share()</code>, which internally creates a share request record to a database and triggers a background service to process that request. If the device has no connectivity at the moment, a retry will be scheduled according to a retry policy that waits longer and longer between subsequent retries should the request keep failing. The current implementation calculates retry intervals based on the Fibonacci sequence and gives up on records that has failed for more than two days.</p>
+<p>After confirming that a <code>WingsEndpoint#isLinked()</code>, you want to start sharing photos to that endpoint. This is done by calling <code>Wings#share()</code>, which internally creates a share request record to a database and triggers a background service to process that request. If the device has no connectivity at the moment, a retry will be scheduled according to a retry policy that waits longer and longer between subsequent retries should the request keep failing. The current implementation calculates retry intervals based on the Fibonacci sequence and gives up on records that has failed for more than two days.</p>
 
-<p>The following call would create a share request to post a photo to the user's Facebook profile. A notification will appear on the status bar once the photo has been shared.</p>
+<p>The following call will create a share request to post a photo to the user's Facebook profile. A notification will appear on the status bar once the photo has been shared.</p>
 
 <pre><code>Wings.share(filePath, FacebookEndpoint.DestinationId.PROFILE, FacebookEndpoint.class)
 </code></pre>
@@ -134,7 +134,7 @@ Wings.init(module, FacebookEndpoint.class, DropboxEndpoint.class, GoogleCloudPri
 <h2>
 <a id="creating-a-new-endpoint" class="anchor" href="#creating-a-new-endpoint" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating a new endpoint</h2>
 
-<p>If you intend to create a new endpoint, it'd probably a good idea to fork the Git repo instead of cloning it. Just create a concrete implementation of <code>WingsEndpoint</code>, and you'll have a new endpoint. The best way to start is probably to look at how an existing endpoint implements all the interfaces. Once the new endpoint is created, remember to pass it to <code>Wings#init()</code> and consider submitting a pull request from your fork :)</p>
+<p>If you intend to create a new endpoint, it'd probably be a good idea to fork the Git repo instead of cloning it. Then create a concrete implementation of <code>WingsEndpoint</code>, and you'll have a new endpoint. The best way to start is to look at how an existing endpoint implements all the interfaces. Once the new endpoint is created, remember to pass it to <code>Wings#init()</code> and consider submitting a pull request from your fork :)</p>
         </section>
 
         <footer>
