@@ -99,8 +99,9 @@
 
 <p>Wings need to be initialized in the <code>Application#onCreate()</code>.</p>
 
-<div class="highlight highlight-java"><pre><span class="pl-stj">IWingsModule</span> module <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">Wings</span>.<span class="pl-stj">DefaultModule</span>(<span class="pl-v">this</span>, looper, logger);
-<span class="pl-stj">Wings</span><span class="pl-k">.</span>init(module, <span class="pl-stj">FacebookEndpoint</span><span class="pl-k">.</span>class, <span class="pl-stj">DropboxEndpoint</span><span class="pl-k">.</span>class, <span class="pl-stj">GoogleCloudPrintEndpoint</span><span class="pl-k">.</span>class);</pre></div>
+<pre><code>IWingsModule module = new Wings.DefaultModule(this, looper, logger);
+Wings.init(module, FacebookEndpoint.class, DropboxEndpoint.class, GoogleCloudPrintEndpoint.class);
+</code></pre>
 
 <p>The <code>looper</code> is used to run background tasks and the <code>logger</code> implements <code>IWingsLogger</code>. All endpoint classes  used in your application should be passed to <code>Wings#init()</code>.</p>
 
@@ -117,7 +118,23 @@
 <pre><code>Wings.getEndpoint(FacebookEndpoint.class).onResumeImpl();
 </code></pre>
 
-<div class="highlight highlight-java"><pre><span class="pl-stj">Wings</span><span class="pl-k">.</span>getEndpoint(<span class="pl-stj">FacebookEndpoint</span><span class="pl-k">.</span>class)<span class="pl-k">.</span>onActivityResultImpl(activity, fragment, requestCode, resultCode, data);</pre></div>
+<pre><code>Wings.getEndpoint(FacebookEndpoint.class).onActivityResultImpl(activity, fragment, requestCode, resultCode, data);
+</code></pre>
+
+<h3>
+<a id="sharing-a-photo" class="anchor" href="#sharing-a-photo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sharing a photo</h3>
+
+<p>After confirming that <code>WingsEndpoint#isLinked()</code>, you want to start sharing photos to the endpoint. This is done by calling <code>Wings#share()</code>, which internally creates a share request record to a database and triggers a background service to process that request. If the device has no connectivity at the moment, a retry will be scheduled according to a retry policy that waits longer and longer between subsequent retries should the request keep failing. The current implementation calculates retry intervals based on the Fibonacci sequence and gives up on records that has failed for more than two days.</p>
+
+<p>The following call would create a share request to post a photo to the user's Facebook profile. A notification will appear on the status bar once the photo has been shared.</p>
+
+<pre><code>Wings.share(filePath, FacebookEndpoint.DestinationId.PROFILE, FacebookEndpoint.class)
+</code></pre>
+
+<h2>
+<a id="creating-a-new-endpoint" class="anchor" href="#creating-a-new-endpoint" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating a new endpoint</h2>
+
+<p>If you intend to create a new endpoint, it'd probably a good idea to fork the Git repo instead of cloning it. Just create a concrete implementation of <code>WingsEndpoint</code>, and you'll have a new endpoint. The best way to start is probably to look at how an existing endpoint implements all the interfaces. Once the new endpoint is created, remember to pass it to <code>Wings#init()</code> and consider submitting a pull request from your fork :)</p>
         </section>
 
         <footer>
