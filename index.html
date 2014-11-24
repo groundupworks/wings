@@ -43,7 +43,37 @@
 
 <p>Wings started off as a component in <a href="https://play.google.com/store/apps/details?id=com.groundupworks.flyingphotobooth">Flying PhotoBooth</a> and <a href="https://play.google.com/store/apps/details?id=com.groundupworks.partyphotobooth">Party PhotoBooth</a>, and has helped us publish photos reliably and efficiently over the years. We are now open-sourcing it because posting a photo should be easy, while integrating with native SDKs of the ever-growing number of service providers is anything but easy... so we hope Wings will take care of that part for you, and should you find yourself building new endpoints, make a pull request and add to the list!</p>
 
-<p>Refer to the <a href="http://groundupworks.github.io/wings">Project Site</a> to get started.</p>
+<h2>
+<a id="adding-wings-to-your-project" class="anchor" href="#adding-wings-to-your-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding Wings to your project</h2>
+
+<p>The Wings library builds multiple artifacts—the core <strong>wings.aar</strong> and an AAR per endpoint, such as <strong>wings-dropbox.aar</strong>. You will only need to include the core library and the endpoints applicable to your application. The recommended way to integrate with Wings is to add the source to your application, but you can also add the AARs instead. The following instructions assume you are building with Gradle in Android Studio.</p>
+
+<h3>
+<a id="adding-wings-as-source" class="anchor" href="#adding-wings-as-source" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding Wings as source</h3>
+
+<p>Clone the Wings source.</p>
+
+<pre><code>$ git clone https://github.com/groundupworks/wings.git
+</code></pre>
+
+<p>Or if you use <a href="http://git-scm.com/book/en/v2/Git-Tools-Submodules">Submodules</a>, add Wings as a submodule to your project.</p>
+
+<pre><code>$ git submodule add https://github.com/groundupworks/wings.git
+</code></pre>
+
+<p>Then from your project in Android Studio, <strong>Import Module...</strong> from the root <strong>wings</strong> folder, and you should see the list of all Wings modules. Select <strong>wings</strong> and the endpoints you want your application to share to. Complete the import, and your project's <strong>settings.gradle</strong> should now contain the Wings modules.</p>
+
+<p>Now you need to add these modules as dependencies in your application's <strong>build.gradle</strong>.</p>
+
+<pre><code>dependencies {
+    compile project(':wings')
+    compile project(':wings-dropbox')     // If applicable
+    compile project(':wings-facebook')    // If applicable
+    compile project(':wings-gcp')         // If applicable
+}
+</code></pre>
+
+<p>Rebuild your project, and we are done with the build stuff.</p>
         </section>
 
         <footer>
