@@ -53,27 +53,35 @@
 
 <p>Clone the Wings source.</p>
 
-<pre><code>$ git clone https://github.com/groundupworks/wings.git
-</code></pre>
+<div class="highlight highlight-bash"><pre>$ git clone https://github.com/groundupworks/wings.git</pre></div>
 
 <p>Or if you use <a href="http://git-scm.com/book/en/v2/Git-Tools-Submodules">Submodules</a>, add Wings as a submodule to your project.</p>
 
-<pre><code>$ git submodule add https://github.com/groundupworks/wings.git
-</code></pre>
+<div class="highlight highlight-bash"><pre>$ git submodule add https://github.com/groundupworks/wings.git</pre></div>
 
 <p>Then from your project in Android Studio, <strong>Import Module...</strong> from the root <strong>wings</strong> folder, and you should see the list of all Wings modules. Select <strong>wings</strong> and the endpoints you want your application to share to. Complete the import, and your project's <strong>settings.gradle</strong> should now contain the Wings modules.</p>
 
 <p>Now you need to add these modules as dependencies in your application's <strong>build.gradle</strong>.</p>
 
-<pre><code>dependencies {
-    compile project(':wings')
-    compile project(':wings-dropbox')     // If applicable
-    compile project(':wings-facebook')    // If applicable
-    compile project(':wings-gcp')         // If applicable
-}
-</code></pre>
+<div class="highlight highlight-groovy"><pre>dependencies {
+    compile project(<span class="pl-s1"><span class="pl-pds">'</span>:wings<span class="pl-pds">'</span></span>)
+    compile project(<span class="pl-s1"><span class="pl-pds">'</span>:wings-dropbox<span class="pl-pds">'</span></span>)     <span class="pl-c">// If applicable</span>
+    compile project(<span class="pl-s1"><span class="pl-pds">'</span>:wings-facebook<span class="pl-pds">'</span></span>)    <span class="pl-c">// If applicable</span>
+    compile project(<span class="pl-s1"><span class="pl-pds">'</span>:wings-gcp<span class="pl-pds">'</span></span>)         <span class="pl-c">// If applicable</span>
+}</pre></div>
 
-<p>Rebuild your project, and we are done with the build stuff.</p>
+<p>Rebuild your project, and say a prayer to the Gradle gods.</p>
+
+<h2>
+<a id="setting-up-the-endpoints" class="anchor" href="#setting-up-the-endpoints" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setting up the endpoints</h2>
+
+<p>You will find <strong>values/application.xml</strong> in some of the endpoint modules. This is where you will specify credentials and configurations specific to your application.</p>
+
+<div class="highlight highlight-xml"><pre><span class="pl-c">&lt;!-- Your app id from Facebook --&gt;</span>
+&lt;<span class="pl-ent">string</span> <span class="pl-e">name</span>=<span class="pl-s1"><span class="pl-pds">"</span>facebook__app_id<span class="pl-pds">"</span></span>&gt;null&lt;/<span class="pl-ent">string</span>&gt;
+
+<span class="pl-c">&lt;!-- The name of the default album to be created for storing photos --&gt;</span>
+&lt;<span class="pl-ent">string</span> <span class="pl-e">name</span>=<span class="pl-s1"><span class="pl-pds">"</span>facebook__app_album_default_name<span class="pl-pds">"</span></span>&gt;null&lt;/<span class="pl-ent">string</span>&gt;</pre></div>
         </section>
 
         <footer>
