@@ -42,9 +42,9 @@ import com.facebook.SessionDefaultAudience;
 import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 import com.facebook.model.GraphObject;
-import com.groundupworks.wings.WingsEndpoint;
 import com.groundupworks.wings.IWingsNotification;
 import com.groundupworks.wings.WingsDestination;
+import com.groundupworks.wings.WingsEndpoint;
 import com.groundupworks.wings.core.ShareRequest;
 
 import org.json.JSONObject;
@@ -77,16 +77,16 @@ public class FacebookEndpoint extends WingsEndpoint {
     /**
      * Facebook app package name.
      */
-    private static final String KATANA_PACKAGE = "com.facebook.katana";
+    private static final String FACEBOOK_APP_PACKAGE = "com.facebook.katana";
 
     //
     // Facebook permissions.
     //
 
     /**
-     * Permission to basic info.
+     * Permission to public profile.
      */
-    private static final String PERMISSION_BASIC_INFO = "basic_info";
+    private static final String PERMISSION_PUBLIC_PROFILE = "public_profile";
 
     /**
      * Permission to user photos.
@@ -246,7 +246,7 @@ public class FacebookEndpoint extends WingsEndpoint {
 
         // Construct read permissions to request for.
         List<String> readPermissions = new LinkedList<String>();
-        readPermissions.add(PERMISSION_BASIC_INFO);
+        readPermissions.add(PERMISSION_PUBLIC_PROFILE);
         readPermissions.add(PERMISSION_USER_PHOTOS);
 
         // Construct open request.
@@ -410,7 +410,7 @@ public class FacebookEndpoint extends WingsEndpoint {
         boolean isInstalled = false;
         try {
             // An exception will be thrown if the package is not found.
-            mContext.getPackageManager().getApplicationInfo(KATANA_PACKAGE, 0);
+            mContext.getPackageManager().getApplicationInfo(FACEBOOK_APP_PACKAGE, 0);
             isInstalled = true;
         } catch (PackageManager.NameNotFoundException e) {
             // Do nothing.
