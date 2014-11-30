@@ -35,7 +35,6 @@ import com.groundupworks.wings.IWingsNotification;
 import com.groundupworks.wings.WingsDestination;
 import com.groundupworks.wings.WingsEndpoint;
 import com.groundupworks.wings.core.ShareRequest;
-import com.groundupworks.wings.facebook.R;
 
 import java.io.File;
 import java.io.FileInputStream;

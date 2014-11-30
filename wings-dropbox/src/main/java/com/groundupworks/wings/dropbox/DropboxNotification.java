@@ -20,7 +20,6 @@ import android.content.Intent;
 import android.net.Uri;
 
 import com.groundupworks.wings.IWingsNotification;
-import com.groundupworks.wings.facebook.R;
 
 /**
  * {@link IWingsNotification} for Dropbox shares.
