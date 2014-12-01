@@ -170,20 +170,22 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
                 .authenticateUsing(this, REQUEST_CODE_BASE)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
+
         findPrinters();
     }
 
     @Override
     public void onAccountSelectionCanceled() {
-        final Intent intent = new Intent();
-        setResult(Activity.RESULT_CANCELED, intent);
+        setResult(Activity.RESULT_CANCELED);
         finish();
     }
 
     @Override
     public void onAuthenticationError(final Throwable throwable) {
         Toast.makeText(getApplicationContext(), R.string.gcp__settings__error_authenticate, Toast.LENGTH_SHORT).show();
-        mOauthObservable = null;
+
+        setResult(Activity.RESULT_CANCELED);
+        finish();
     }
 
     @Override
@@ -194,8 +196,14 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
     @Override
     public void onRetryAuthentication() {
         Toast.makeText(getApplicationContext(), R.string.gcp__settings__error_authenticate, Toast.LENGTH_SHORT).show();
+
+        setResult(Activity.RESULT_CANCELED);
+        finish();
     }
 
+    /**
+     * Finds printers associated with the account.
+     */
     private void findPrinters() {
         mOauthObservable.subscribe(new Action1<String>() {
             @Override

@@ -32,13 +32,12 @@ import com.groundupworks.wings.core.ShareRequest;
 import java.io.File;
 import java.net.HttpURLConnection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import retrofit.client.Response;
 import retrofit.mime.TypedFile;
-import rx.Observable;
-import rx.functions.Func1;
-import rx.functions.Func2;
 
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_ACCOUNT;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_PRINTER;
@@ -159,6 +158,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
     public Set<IWingsNotification> processShareRequests() {
         final Set<IWingsNotification> notifications = new HashSet<IWingsNotification>();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        int shareCount = 0;
 
         final boolean isLinked = preferences.getBoolean(mContext.getString(R.string.gcp__link_key), false);
         final String accountName = preferences.getString(mContext.getString(R.string.gcp__account_name_key), null);
@@ -169,101 +169,69 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         if (isLinked && !TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier) &&
                 !TextUtils.isEmpty(ticket) && !TextUtils.isEmpty(token)) {
             final WingsDestination destination = new WingsDestination(DestinationId.PRINT_QUEUE, ENDPOINT_ID);
-            final Observable<ShareRequest> requestObservable = Observable
-                    .from(mDatabase.checkoutShareRequests(destination))
-                    .cache();
-            final Observable<Response> responseObservable = requestObservable
-                    .map(new Func1<ShareRequest, File>() {
-                        @Override
-                        public File call(final ShareRequest shareRequest) {
-                            return new File(shareRequest.getFilePath());
-                        }
-                    })
-                    .filter(new Func1<File, Boolean>() {
-                        @Override
-                        public Boolean call(final File file) {
-                            return file.exists();
-                        }
-                    })
-                    .flatMap(new Func1<File, Observable<Response>>() {
-                        @Override
-                        public Observable<Response> call(final File file) {
-                            return mGoogleCloudPrint.submitPrintJob(token, printerIdentifier,
-                                    file.getName(), ticket, new TypedFile(MIME_TYPE, file));
-                        }
-                    });
-            final Observable<IWingsNotification> notificationObservable = Observable
-                    .zip(requestObservable, responseObservable, new Func2<ShareRequest, Response, Boolean>() {
-                        @Override
-                        public Boolean call(final ShareRequest shareRequest, final Response response) {
-                            boolean isSuccessful = false;
-                            if (response.getStatus() == HttpURLConnection.HTTP_OK) {
-                                mDatabase.markSuccessful(shareRequest.getId());
-                                isSuccessful = true;
-                            } else {
-                                mDatabase.markFailed(shareRequest.getId());
-                            }
-                            return isSuccessful;
-                        }
-                    })
-                    .filter(new Func1<Boolean, Boolean>() {
-                        @Override
-                        public Boolean call(Boolean aBoolean) {
-                            return aBoolean;
-                        }
-                    })
-                    .count()
-                    .filter(new Func1<Integer, Boolean>() {
-                        @Override
-                        public Boolean call(Integer count) {
-                            return count > 0;
-                        }
-                    })
-                    .map(new Func1<Integer, IWingsNotification>() {
-                        @Override
-                        public IWingsNotification call(final Integer count) {
-                            return new IWingsNotification() {
 
-                                @Override
-                                public int getId() {
-                                    return destination.getHash();
-                                }
-
-                                @Override
-                                public String getTitle() {
-                                    return mContext.getString(R.string.gcp__notification_shared_title);
-                                }
-
-                                @Override
-                                public String getMessage() {
-                                    String msg;
-                                    if (count == 1) {
-                                        msg = mContext.getString(R.string.gcp__notification_shared_msg_single, printerIdentifier);
-                                    } else {
-                                        msg = mContext.getString(R.string.gcp__notification_shared_msg_multi, count, printerIdentifier);
-                                    }
-                                    return msg;
-                                }
-
-                                @Override
-                                public String getTicker() {
-                                    return mContext.getString(R.string.gcp__notification_shared_ticker);
-                                }
-
-                                @Override
-                                public Intent getIntent() {
-                                    return new Intent();
-                                }
-                            };
+            List<ShareRequest> shareRequests = mDatabase.checkoutShareRequests(destination);
+            for (ShareRequest shareRequest : shareRequests) {
+                File file = new File(shareRequest.getFilePath());
+                if (file.exists()) {
+                    try {
+                        Response response = mGoogleCloudPrint.submitPrintJob(token, printerIdentifier,
+                                file.getName(), ticket, new TypedFile(MIME_TYPE, file)).toBlocking().first();
+                        if (response.getStatus() == HttpURLConnection.HTTP_OK) {
+                            mDatabase.markSuccessful(shareRequest.getId());
+                            shareCount++;
+                        } else {
+                            mDatabase.markFailed(shareRequest.getId());
                         }
-                    });
+                    } catch (NoSuchElementException e) {
+                        mDatabase.markFailed(shareRequest.getId());
+                    }
+                } else {
+                    mDatabase.markFailed(shareRequest.getId());
+                }
+            }
 
-            try {
-                notifications.add(notificationObservable.toBlocking().last());
-            } catch (Throwable t) {
-                sLogger.log(GoogleCloudPrintEndpoint.class, "processShareRequests", "throwable=" + t);
+            // Create and add notification.
+            if (shareCount > 0) {
+                final int count = shareCount;
+                IWingsNotification notification = new IWingsNotification() {
+
+                    @Override
+                    public int getId() {
+                        return destination.getHash();
+                    }
+
+                    @Override
+                    public String getTitle() {
+                        return mContext.getString(R.string.gcp__notification_shared_title);
+                    }
+
+                    @Override
+                    public String getMessage() {
+                        String msg;
+                        if (count == 1) {
+                            msg = mContext.getString(R.string.gcp__notification_shared_msg_single, printerIdentifier);
+                        } else {
+                            msg = mContext.getString(R.string.gcp__notification_shared_msg_multi, count, printerIdentifier);
+                        }
+                        return msg;
+                    }
+
+                    @Override
+                    public String getTicker() {
+                        return mContext.getString(R.string.gcp__notification_shared_ticker);
+                    }
+
+                    @Override
+                    public Intent getIntent() {
+                        return new Intent();
+                    }
+                };
+
+                notifications.add(notification);
             }
         }
+
         return notifications;
     }
 
