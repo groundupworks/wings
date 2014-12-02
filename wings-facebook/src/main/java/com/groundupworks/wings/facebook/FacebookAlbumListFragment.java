@@ -29,6 +29,7 @@ import com.facebook.Request.GraphUserCallback;
 import com.facebook.Response;
 import com.facebook.model.GraphObject;
 import com.facebook.model.GraphUser;
+import com.groundupworks.wings.Wings;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -72,7 +73,7 @@ public class FacebookAlbumListFragment extends ListFragment {
     /**
      * A {@link FacebookEndpoint} instance.
      */
-    private FacebookEndpoint mFacebookEndpoint = new FacebookEndpoint();
+    private FacebookEndpoint mFacebookEndpoint = (FacebookEndpoint) Wings.getEndpoint(FacebookEndpoint.class);
 
     /**
      * Cursor to back the albums list.

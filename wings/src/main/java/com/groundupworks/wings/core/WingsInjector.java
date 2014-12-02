@@ -20,6 +20,7 @@ import android.os.Looper;
 
 import com.groundupworks.wings.IWingsLogger;
 import com.groundupworks.wings.IWingsModule;
+import com.squareup.otto.Bus;
 
 import dagger.ObjectGraph;
 
@@ -34,6 +35,12 @@ public final class WingsInjector {
      * The {@link dagger.ObjectGraph} to hold all Wings dependencies.
      */
     private static ObjectGraph sObjectGraph;
+
+    /**
+     * Private constructor to ensure this class cannot be instantiated.
+     */
+    private WingsInjector() {
+    }
 
     /**
      * Initializer used to pass Wings dependencies via a concrete implementation of the
@@ -86,6 +93,15 @@ public final class WingsInjector {
      */
     public static final IWingsLogger getLogger() {
         return sObjectGraph.get(IWingsLogger.class);
+    }
+
+    /**
+     * Gets the event bus to communicate link events.
+     *
+     * @return the {@link com.squareup.otto.Bus}.
+     */
+    public static final Bus getBus() {
+        return sObjectGraph.get(Bus.class);
     }
 
     /**
