@@ -27,7 +27,9 @@ import com.github.dpsm.android.print.GoogleCloudPrint;
 import com.groundupworks.wings.IWingsNotification;
 import com.groundupworks.wings.WingsDestination;
 import com.groundupworks.wings.WingsEndpoint;
+import com.groundupworks.wings.WingsLinkEvent;
 import com.groundupworks.wings.core.ShareRequest;
+import com.squareup.otto.Produce;
 
 import java.io.File;
 import java.net.HttpURLConnection;
@@ -86,6 +88,10 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         editor.remove(mContext.getString(R.string.gcp__token));
         editor.apply();
 
+
+        // Emit link state change event.
+        notifyLinkStateChanged(new LinkEvent(false));
+
         // Remove existing share requests in a background thread.
         mHandler.post(new Runnable() {
 
@@ -125,6 +131,9 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                     editor.putString(mContext.getString(R.string.gcp__ticket), ticket);
                     editor.putString(mContext.getString(R.string.gcp__token), token);
                     editor.apply();
+
+                    // Emit link state change event.
+                    notifyLinkStateChanged(new LinkEvent(true));
                 } else {
                     Toast.makeText(mContext, mContext.getString(R.string.gcp__error_link), Toast.LENGTH_SHORT).show();
                     unlink();
@@ -235,6 +244,16 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         return notifications;
     }
 
+    @Override
+    @Produce
+    public GoogleCloudPrintEndpoint.LinkEvent produceLinkEvent() {
+        return new LinkEvent(isLinked());
+    }
+
+    //
+    // Public interfaces and classes.
+    //
+
     /**
      * The list of destination ids.
      */
@@ -244,5 +263,20 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
          * The GCP print queue.
          */
         public static final int PRINT_QUEUE = 0;
+    }
+
+    /**
+     * The link event implementation associated with this endpoint.
+     */
+    public class LinkEvent extends WingsLinkEvent {
+
+        /**
+         * Private constructor.
+         *
+         * @param isLinked true if current link state for this endpoint is linked; false otherwise.
+         */
+        private LinkEvent(boolean isLinked) {
+            super(GoogleCloudPrintEndpoint.class, isLinked);
+        }
     }
 }

@@ -24,6 +24,7 @@ import android.support.v4.app.Fragment;
 import com.groundupworks.wings.core.ShareRequest;
 import com.groundupworks.wings.core.WingsDbHelper;
 import com.groundupworks.wings.core.WingsInjector;
+import com.squareup.otto.Bus;
 
 import java.util.Set;
 
@@ -53,6 +54,31 @@ public abstract class WingsEndpoint {
      * The Wings database.
      */
     protected final WingsDbHelper mDatabase = WingsInjector.getDatabase();
+
+    /**
+     * The event bus to communicate link events.
+     */
+    private final Bus mBus = WingsInjector.getBus();
+
+    /**
+     * Protected constructor.
+     */
+    protected WingsEndpoint() {
+        mBus.register(this);
+    }
+
+    /**
+     * Notifies subscribers that the link state has changed. Each endpoint implementation must call
+     * this method with its own {@link com.groundupworks.wings.WingsLinkEvent} subclass when the
+     * link state has changed.
+     *
+     * @param event the {@link com.groundupworks.wings.WingsLinkEvent} implementation associated with
+     *              the specific endpoint.
+     * @param <T>   the type for the {@link com.groundupworks.wings.WingsLinkEvent} subclass.
+     */
+    protected <T extends WingsLinkEvent> void notifyLinkStateChanged(T event) {
+        mBus.post(event);
+    }
 
     /**
      * The id that is unique to each endpoint.
@@ -126,4 +152,16 @@ public abstract class WingsEndpoint {
      * May be null or an empty set.
      */
     public abstract Set<IWingsNotification> processShareRequests();
+
+    /**
+     * Produces a {@link com.groundupworks.wings.WingsLinkEvent} subclass reflecting the current link
+     * state of the endpoint. This event is emitted to a subscriber immediately after subscription.
+     * <p/>
+     * The implementation of this method must be annotated with {@link com.squareup.otto.Produce}.
+     *
+     * @param <T> the type for the {@link com.groundupworks.wings.WingsLinkEvent} subclass.
+     * @return the {@link com.groundupworks.wings.WingsLinkEvent} implementation associated with
+     * the specific endpoint.
+     */
+    public abstract <T extends WingsLinkEvent> T produceLinkEvent();
 }

@@ -45,7 +45,9 @@ import com.facebook.model.GraphObject;
 import com.groundupworks.wings.IWingsNotification;
 import com.groundupworks.wings.WingsDestination;
 import com.groundupworks.wings.WingsEndpoint;
+import com.groundupworks.wings.WingsLinkEvent;
 import com.groundupworks.wings.core.ShareRequest;
+import com.squareup.otto.Produce;
 
 import org.json.JSONObject;
 
@@ -435,6 +437,10 @@ public class FacebookEndpoint extends WingsEndpoint {
         if (accountName != null && accountName.length() > 0 && albumName != null && albumName.length() > 0
                 && albumGraphPath != null && albumGraphPath.length() > 0) {
             storeAccountParams(accountName, photoPrivacy, albumName, albumGraphPath);
+
+            // Emit link state change event.
+            notifyLinkStateChanged(new LinkEvent(true));
+
             isSuccessful = true;
         }
         return isSuccessful;
@@ -644,6 +650,9 @@ public class FacebookEndpoint extends WingsEndpoint {
             session.closeAndClearTokenInformation();
         }
 
+        // Emit link state change event.
+        notifyLinkStateChanged(new LinkEvent(false));
+
         // Remove existing share requests in a background thread.
         mHandler.post(new Runnable() {
 
@@ -836,9 +845,14 @@ public class FacebookEndpoint extends WingsEndpoint {
         return notifications;
     }
 
+    @Override
+    @Produce
+    public LinkEvent produceLinkEvent() {
+        return new LinkEvent(isLinked());
+    }
 
     //
-    // Public interfaces.
+    // Public interfaces and classes.
     //
 
     /**
@@ -850,5 +864,20 @@ public class FacebookEndpoint extends WingsEndpoint {
          * The personal Facebook profile.
          */
         public static final int PROFILE = 0;
+    }
+
+    /**
+     * The link event implementation associated with this endpoint.
+     */
+    public class LinkEvent extends WingsLinkEvent {
+
+        /**
+         * Private constructor.
+         *
+         * @param isLinked true if current link state for this endpoint is linked; false otherwise.
+         */
+        private LinkEvent(boolean isLinked) {
+            super(FacebookEndpoint.class, isLinked);
+        }
     }
 }

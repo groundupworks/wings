@@ -18,6 +18,8 @@ package com.groundupworks.wings;
 import android.content.Context;
 import android.os.Looper;
 
+import com.squareup.otto.Bus;
+
 /**
  * Dagger module for injecting classes into Wings.
  *
@@ -45,4 +47,11 @@ public interface IWingsModule {
      * @return the {@link com.groundupworks.wings.IWingsLogger}.
      */
     public IWingsLogger provideLogger();
+
+    /**
+     * The event bus to communicate link events.
+     *
+     * @return the {@link com.squareup.otto.Bus}.
+     */
+    public Bus provideBus();
 }

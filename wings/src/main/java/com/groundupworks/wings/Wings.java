@@ -22,6 +22,7 @@ import android.os.Looper;
 import com.groundupworks.wings.core.WingsDbHelper;
 import com.groundupworks.wings.core.WingsInjector;
 import com.groundupworks.wings.core.WingsService;
+import com.squareup.otto.Bus;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -50,6 +51,13 @@ public final class Wings {
      * essentially immutable after a successful initialization.
      */
     private static volatile Set<WingsEndpoint> sEndpoints = new HashSet<WingsEndpoint>();
+
+
+    /**
+     * Private constructor to ensure this class cannot be instantiated.
+     */
+    private Wings() {
+    }
 
     /**
      * Initializer used to pass dependencies for Wings. This method must be called in the
@@ -127,6 +135,39 @@ public final class Wings {
     }
 
     /**
+     * Subscribes to link state changes of the endpoints. The subscribing {@link java.lang.Object} must
+     * have one or more {@link com.squareup.otto.Subscribe}-annotated methods, each taking a single
+     * parameter that corresponds to the {@link com.groundupworks.wings.WingsLinkEvent} subclass of the
+     * endpoint subscribed to.
+     * <p/>
+     * Upon subscription, the subscriber will immediately receive an event with the current link state
+     * even though the link state did not actually change. This initial value allows the subscriber
+     * to reflect the initial link state in the ui.
+     *
+     * @param object the {@link java.lang.Object} subscribing to the link state changes of the endpoints.
+     * @throws IllegalStateException Wings must be initialized. See {@link Wings#init(IWingsModule, Class[])}.
+     */
+    public static void subscribe(Object object) throws IllegalStateException {
+        if (!sIsInitialized) {
+            throw new IllegalStateException("Wings must be initialized. See Wings#init().");
+        }
+        WingsInjector.getBus().register(object);
+    }
+
+    /**
+     * Unsubscribes to link state changes of the endpoints.
+     *
+     * @param object the {@link java.lang.Object} you wish to unsubscribe.
+     * @throws IllegalStateException Wings must be initialized. See {@link Wings#init(IWingsModule, Class[])}.
+     */
+    public static void unsubscribe(Object object) throws IllegalStateException {
+        if (!sIsInitialized) {
+            throw new IllegalStateException("Wings must be initialized. See Wings#init().");
+        }
+        WingsInjector.getBus().unregister(object);
+    }
+
+    /**
      * Shares an image to the specified destination at an endpoint. The client is responsible for ensuring
      * that the file exists, and the destination id valid for that endpoint.
      *
@@ -154,7 +195,7 @@ public final class Wings {
      */
     @Module(
             staticInjections = {WingsService.class, WingsDbHelper.class},
-            injects = {Context.class, Looper.class, IWingsLogger.class, WingsService.class, WingsDbHelper.class}
+            injects = {Context.class, Looper.class, Bus.class, IWingsLogger.class, WingsService.class, WingsDbHelper.class}
     )
     public static class DefaultModule implements IWingsModule {
 
@@ -186,22 +227,32 @@ public final class Wings {
             mLogger = logger;
         }
 
+        @Override
         @Singleton
         @Provides
         public Context provideContext() {
             return mContext;
         }
 
+        @Override
         @Singleton
         @Provides
         public Looper provideLooper() {
             return mLooper;
         }
 
+        @Override
         @Singleton
         @Provides
         public IWingsLogger provideLogger() {
             return mLogger;
+        }
+
+        @Override
+        @Singleton
+        @Provides
+        public Bus provideBus() {
+            return new Bus();
         }
     }
 }

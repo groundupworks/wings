@@ -34,7 +34,9 @@ import com.dropbox.client2.session.AppKeyPair;
 import com.groundupworks.wings.IWingsNotification;
 import com.groundupworks.wings.WingsDestination;
 import com.groundupworks.wings.WingsEndpoint;
+import com.groundupworks.wings.WingsLinkEvent;
 import com.groundupworks.wings.core.ShareRequest;
+import com.squareup.otto.Produce;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -134,12 +136,20 @@ public class DropboxEndpoint extends WingsEndpoint {
                         }
 
                         // Validate account settings and store.
+                        Handler uiHandler = new Handler(Looper.getMainLooper());
                         if (accountName != null && accountName.length() > 0 && shareUrl != null
                                 && shareUrl.length() > 0 && accessToken != null) {
                             storeAccountParams(accountName, shareUrl, accessToken);
+
+                            // Emit link state change event on ui thread.
+                            uiHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    notifyLinkStateChanged(new LinkEvent(true));
+                                }
+                            });
                         } else {
                             // Handle error on ui thread.
-                            Handler uiHandler = new Handler(Looper.getMainLooper());
                             uiHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -320,6 +330,9 @@ public class DropboxEndpoint extends WingsEndpoint {
             }
         }
 
+        // Emit link state change event.
+        notifyLinkStateChanged(new LinkEvent(false));
+
         // Remove existing share requests in a background thread.
         mHandler.post(new Runnable() {
 
@@ -441,8 +454,14 @@ public class DropboxEndpoint extends WingsEndpoint {
         return notifications;
     }
 
+    @Override
+    @Produce
+    public DropboxEndpoint.LinkEvent produceLinkEvent() {
+        return new LinkEvent(isLinked());
+    }
+
     //
-    // Public interfaces.
+    // Public interfaces and classes.
     //
 
     /**
@@ -454,5 +473,20 @@ public class DropboxEndpoint extends WingsEndpoint {
          * The Dropbox app folder.
          */
         public static final int APP_FOLDER = 0;
+    }
+
+    /**
+     * The link event implementation associated with this endpoint.
+     */
+    public class LinkEvent extends WingsLinkEvent {
+
+        /**
+         * Private constructor.
+         *
+         * @param isLinked true if current link state for this endpoint is linked; false otherwise.
+         */
+        private LinkEvent(boolean isLinked) {
+            super(DropboxEndpoint.class, isLinked);
+        }
     }
 }
