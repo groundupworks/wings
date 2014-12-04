@@ -68,7 +68,7 @@ public class RetryPolicy {
      */
     static long incrementAndGetTime(Context context) {
         Context appContext = context.getApplicationContext();
-        String key = appContext.getString(R.string.retry_policy__consecutive_fails);
+        String key = appContext.getString(R.string.wings__retry_policy_consecutive_fails);
 
         // Get the number of consecutive fails.
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);
@@ -90,7 +90,7 @@ public class RetryPolicy {
      */
     static void reset(Context context) {
         Context appContext = context.getApplicationContext();
-        String key = appContext.getString(R.string.retry_policy__consecutive_fails);
+        String key = appContext.getString(R.string.wings__retry_policy_consecutive_fails);
 
         // Synchronously reset consecutive fail count.
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(appContext);

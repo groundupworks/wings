@@ -11,6 +11,6 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".FacebookSettingsActivity"
-            android:label="@string/facebook__settings__label" />
+            android:label="@string/wings_facebook__settings__label" />
     </application>
 </manifest>

@@ -49,13 +49,13 @@ public class FacebookNotification implements IWingsNotification {
      */
     FacebookNotification(Context context, int id, String albumName, int shared, String intentUri) {
         mId = id;
-        mTitle = context.getString(R.string.facebook__notification_shared_title);
+        mTitle = context.getString(R.string.wings_facebook__notification_shared_title);
         if (shared > 1) {
-            mMessage = context.getString(R.string.facebook__notification_shared_msg_multi, shared, albumName);
+            mMessage = context.getString(R.string.wings_facebook__notification_shared_msg_multi, shared, albumName);
         } else {
-            mMessage = context.getString(R.string.facebook__notification_shared_msg_single, albumName);
+            mMessage = context.getString(R.string.wings_facebook__notification_shared_msg_single, albumName);
         }
-        mTicker = context.getString(R.string.facebook__notification_shared_ticker);
+        mTicker = context.getString(R.string.wings_facebook__notification_shared_ticker);
         mIntentUri = intentUri;
     }
 

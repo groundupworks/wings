@@ -86,7 +86,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
                         R.id.activity_main_spinner_item_text, printers
                 ));
             } else {
-                Toast.makeText(getApplicationContext(), R.string.gcp__settings__error_no_printer, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.wings_gcp__settings__error_no_printer, Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -94,7 +94,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
     private final Action1<Throwable> mShowPrinterNotFoundAction = new Action1<Throwable>() {
         @Override
         public void call(final Throwable throwable) {
-            Toast.makeText(getApplicationContext(), R.string.gcp__settings__error_no_printer, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), R.string.wings_gcp__settings__error_no_printer, Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -182,7 +182,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
 
     @Override
     public void onAuthenticationError(final Throwable throwable) {
-        Toast.makeText(getApplicationContext(), R.string.gcp__settings__error_authenticate, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), R.string.wings_gcp__settings__error_authenticate, Toast.LENGTH_SHORT).show();
 
         setResult(Activity.RESULT_CANCELED);
         finish();
@@ -195,7 +195,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
 
     @Override
     public void onRetryAuthentication() {
-        Toast.makeText(getApplicationContext(), R.string.gcp__settings__error_authenticate, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), R.string.wings_gcp__settings__error_authenticate, Toast.LENGTH_SHORT).show();
 
         setResult(Activity.RESULT_CANCELED);
         finish();

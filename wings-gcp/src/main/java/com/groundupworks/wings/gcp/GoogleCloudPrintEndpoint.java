@@ -81,11 +81,11 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
     @Override
     public void unlink() {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-        editor.putBoolean(mContext.getString(R.string.gcp__link_key), false);
-        editor.remove(mContext.getString(R.string.gcp__account_name_key));
-        editor.remove(mContext.getString(R.string.gcp__printer_identifier_key));
-        editor.remove(mContext.getString(R.string.gcp__ticket));
-        editor.remove(mContext.getString(R.string.gcp__token));
+        editor.putBoolean(mContext.getString(R.string.wings_gcp__link_key), false);
+        editor.remove(mContext.getString(R.string.wings_gcp__account_name_key));
+        editor.remove(mContext.getString(R.string.wings_gcp__printer_identifier_key));
+        editor.remove(mContext.getString(R.string.wings_gcp__ticket));
+        editor.remove(mContext.getString(R.string.wings_gcp__token));
         editor.apply();
 
 
@@ -105,7 +105,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
     @Override
     public boolean isLinked() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getBoolean(mContext.getString(R.string.gcp__link_key), false);
+        return preferences.getBoolean(mContext.getString(R.string.wings_gcp__link_key), false);
     }
 
     @Override
@@ -125,21 +125,21 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
 
                 if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier) && !TextUtils.isEmpty(ticket) && !TextUtils.isEmpty(token)) {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-                    editor.putBoolean(mContext.getString(R.string.gcp__link_key), true);
-                    editor.putString(mContext.getString(R.string.gcp__account_name_key), accountName);
-                    editor.putString(mContext.getString(R.string.gcp__printer_identifier_key), printerIdentifier);
-                    editor.putString(mContext.getString(R.string.gcp__ticket), ticket);
-                    editor.putString(mContext.getString(R.string.gcp__token), token);
+                    editor.putBoolean(mContext.getString(R.string.wings_gcp__link_key), true);
+                    editor.putString(mContext.getString(R.string.wings_gcp__account_name_key), accountName);
+                    editor.putString(mContext.getString(R.string.wings_gcp__printer_identifier_key), printerIdentifier);
+                    editor.putString(mContext.getString(R.string.wings_gcp__ticket), ticket);
+                    editor.putString(mContext.getString(R.string.wings_gcp__token), token);
                     editor.apply();
 
                     // Emit link state change event.
                     notifyLinkStateChanged(new LinkEvent(true));
                 } else {
-                    Toast.makeText(mContext, mContext.getString(R.string.gcp__error_link), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, mContext.getString(R.string.wings_gcp__error_link), Toast.LENGTH_SHORT).show();
                     unlink();
                 }
             } else {
-                Toast.makeText(mContext, mContext.getString(R.string.gcp__error_link), Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getString(R.string.wings_gcp__error_link), Toast.LENGTH_SHORT).show();
                 unlink();
             }
         }
@@ -148,17 +148,17 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
     @Override
     public String getLinkedAccountName() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.gcp__account_name_key), null);
+        return preferences.getString(mContext.getString(R.string.wings_gcp__account_name_key), null);
     }
 
     @Override
     public String getDestinationDescription(final int destinationId) {
         String destinationDescription = null;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String accountName = preferences.getString(mContext.getString(R.string.gcp__account_name_key), null);
-        String printerIdentifier = preferences.getString(mContext.getString(R.string.gcp__printer_identifier_key), null);
+        String accountName = preferences.getString(mContext.getString(R.string.wings_gcp__account_name_key), null);
+        String printerIdentifier = preferences.getString(mContext.getString(R.string.wings_gcp__printer_identifier_key), null);
         if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier)) {
-            destinationDescription = mContext.getString(R.string.gcp__destination_description, accountName, printerIdentifier);
+            destinationDescription = mContext.getString(R.string.wings_gcp__destination_description, accountName, printerIdentifier);
         }
         return destinationDescription;
     }
@@ -169,11 +169,11 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         int shareCount = 0;
 
-        final boolean isLinked = preferences.getBoolean(mContext.getString(R.string.gcp__link_key), false);
-        final String accountName = preferences.getString(mContext.getString(R.string.gcp__account_name_key), null);
-        final String printerIdentifier = preferences.getString(mContext.getString(R.string.gcp__printer_identifier_key), null);
-        final String ticket = preferences.getString(mContext.getString(R.string.gcp__ticket), null);
-        final String token = preferences.getString(mContext.getString(R.string.gcp__token), null);
+        final boolean isLinked = preferences.getBoolean(mContext.getString(R.string.wings_gcp__link_key), false);
+        final String accountName = preferences.getString(mContext.getString(R.string.wings_gcp__account_name_key), null);
+        final String printerIdentifier = preferences.getString(mContext.getString(R.string.wings_gcp__printer_identifier_key), null);
+        final String ticket = preferences.getString(mContext.getString(R.string.wings_gcp__ticket), null);
+        final String token = preferences.getString(mContext.getString(R.string.wings_gcp__token), null);
 
         if (isLinked && !TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier) &&
                 !TextUtils.isEmpty(ticket) && !TextUtils.isEmpty(token)) {
@@ -212,23 +212,23 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
 
                     @Override
                     public String getTitle() {
-                        return mContext.getString(R.string.gcp__notification_shared_title);
+                        return mContext.getString(R.string.wings_gcp__notification_shared_title);
                     }
 
                     @Override
                     public String getMessage() {
                         String msg;
                         if (count == 1) {
-                            msg = mContext.getString(R.string.gcp__notification_shared_msg_single, printerIdentifier);
+                            msg = mContext.getString(R.string.wings_gcp__notification_shared_msg_single, printerIdentifier);
                         } else {
-                            msg = mContext.getString(R.string.gcp__notification_shared_msg_multi, count, printerIdentifier);
+                            msg = mContext.getString(R.string.wings_gcp__notification_shared_msg_multi, count, printerIdentifier);
                         }
                         return msg;
                     }
 
                     @Override
                     public String getTicker() {
-                        return mContext.getString(R.string.gcp__notification_shared_ticker);
+                        return mContext.getString(R.string.wings_gcp__notification_shared_ticker);
                     }
 
                     @Override

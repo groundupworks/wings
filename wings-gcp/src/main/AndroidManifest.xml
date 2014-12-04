@@ -8,6 +8,6 @@
 
         <activity
             android:name=".GoogleCloudPrintSettingsActivity"
-            android:label="@string/gcp__settings__label" />
+            android:label="@string/wings_gcp__settings__label" />
     </application>
 </manifest>

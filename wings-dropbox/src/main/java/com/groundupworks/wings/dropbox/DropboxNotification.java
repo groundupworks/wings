@@ -49,13 +49,13 @@ public class DropboxNotification implements IWingsNotification {
      */
     DropboxNotification(Context context, int id, String shareUrl, int shared, String intentUri) {
         mId = id;
-        mTitle = context.getString(R.string.dropbox__notification_shared_title);
+        mTitle = context.getString(R.string.wings_dropbox__notification_shared_title);
         if (shared > 1) {
-            mMessage = context.getString(R.string.dropbox__notification_shared_msg_multi, shared, shareUrl);
+            mMessage = context.getString(R.string.wings_dropbox__notification_shared_msg_multi, shared, shareUrl);
         } else {
-            mMessage = context.getString(R.string.dropbox__notification_shared_msg_single, shareUrl);
+            mMessage = context.getString(R.string.wings_dropbox__notification_shared_msg_single, shareUrl);
         }
-        mTicker = context.getString(R.string.dropbox__notification_shared_ticker);
+        mTicker = context.getString(R.string.wings_dropbox__notification_shared_ticker);
         mIntentUri = intentUri;
     }
 

@@ -178,7 +178,7 @@ public class DropboxEndpoint extends WingsEndpoint {
      * Displays the link error message.
      */
     private void showLinkError() {
-        Toast.makeText(mContext, mContext.getString(R.string.dropbox__error_link), Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, mContext.getString(R.string.wings_dropbox__error_link), Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -249,12 +249,12 @@ public class DropboxEndpoint extends WingsEndpoint {
      */
     private void storeAccountParams(String accountName, String shareUrl, String accessToken) {
         Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-        editor.putString(mContext.getString(R.string.dropbox__account_name_key), accountName);
-        editor.putString(mContext.getString(R.string.dropbox__share_url_key), shareUrl);
-        editor.putString(mContext.getString(R.string.dropbox__access_token_key), accessToken);
+        editor.putString(mContext.getString(R.string.wings_dropbox__account_name_key), accountName);
+        editor.putString(mContext.getString(R.string.wings_dropbox__share_url_key), shareUrl);
+        editor.putString(mContext.getString(R.string.wings_dropbox__access_token_key), accessToken);
 
         // Set preference to linked.
-        editor.putBoolean(mContext.getString(R.string.dropbox__link_key), true);
+        editor.putBoolean(mContext.getString(R.string.wings_dropbox__link_key), true);
         editor.apply();
     }
 
@@ -263,12 +263,12 @@ public class DropboxEndpoint extends WingsEndpoint {
      */
     private void removeAccountParams() {
         Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-        editor.remove(mContext.getString(R.string.dropbox__account_name_key));
-        editor.remove(mContext.getString(R.string.dropbox__share_url_key));
-        editor.remove(mContext.getString(R.string.dropbox__access_token_key));
+        editor.remove(mContext.getString(R.string.wings_dropbox__account_name_key));
+        editor.remove(mContext.getString(R.string.wings_dropbox__share_url_key));
+        editor.remove(mContext.getString(R.string.wings_dropbox__access_token_key));
 
         // Set preference to unlinked.
-        editor.putBoolean(mContext.getString(R.string.dropbox__link_key), false);
+        editor.putBoolean(mContext.getString(R.string.wings_dropbox__link_key), false);
         editor.apply();
     }
 
@@ -279,7 +279,7 @@ public class DropboxEndpoint extends WingsEndpoint {
      */
     private String getLinkedAccessToken() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.dropbox__access_token_key), null);
+        return preferences.getString(mContext.getString(R.string.wings_dropbox__access_token_key), null);
     }
 
     /**
@@ -289,7 +289,7 @@ public class DropboxEndpoint extends WingsEndpoint {
      */
     private String getLinkedShareUrl() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.dropbox__share_url_key), null);
+        return preferences.getString(mContext.getString(R.string.wings_dropbox__share_url_key), null);
     }
 
     //
@@ -346,7 +346,7 @@ public class DropboxEndpoint extends WingsEndpoint {
     @Override
     public boolean isLinked() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getBoolean(mContext.getString(R.string.dropbox__link_key), false);
+        return preferences.getBoolean(mContext.getString(R.string.wings_dropbox__link_key), false);
     }
 
     @Override
@@ -369,7 +369,7 @@ public class DropboxEndpoint extends WingsEndpoint {
     @Override
     public String getLinkedAccountName() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.dropbox__account_name_key), null);
+        return preferences.getString(mContext.getString(R.string.wings_dropbox__account_name_key), null);
     }
 
     @Override
@@ -378,7 +378,7 @@ public class DropboxEndpoint extends WingsEndpoint {
         String accountName = getLinkedAccountName();
         String shareUrl = getLinkedShareUrl();
         if (accountName != null && accountName.length() > 0 && shareUrl != null && shareUrl.length() > 0) {
-            destinationDescription = mContext.getString(R.string.dropbox__destination_description, accountName, shareUrl);
+            destinationDescription = mContext.getString(R.string.wings_dropbox__destination_description, accountName, shareUrl);
         }
         return destinationDescription;
     }

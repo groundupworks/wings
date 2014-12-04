@@ -468,14 +468,14 @@ public class FacebookEndpoint extends WingsEndpoint {
      * Displays the link error message.
      */
     private void showLinkError() {
-        Toast.makeText(mContext, mContext.getString(R.string.facebook__error_link), Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, mContext.getString(R.string.wings_facebook__error_link), Toast.LENGTH_SHORT).show();
     }
 
     /**
      * Displays the Facebook app error message.
      */
     private void showFacebookAppError() {
-        Toast.makeText(mContext, mContext.getString(R.string.facebook__error_facebook_app), Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, mContext.getString(R.string.wings_facebook__error_facebook_app), Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -489,15 +489,15 @@ public class FacebookEndpoint extends WingsEndpoint {
     private void storeAccountParams(String accountName, String photoPrivacy, String albumName,
                                     String albumGraphPath) {
         Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-        editor.putString(mContext.getString(R.string.facebook__account_name_key), accountName);
+        editor.putString(mContext.getString(R.string.wings_facebook__account_name_key), accountName);
         if (photoPrivacy != null && photoPrivacy.length() > 0) {
-            editor.putString(mContext.getString(R.string.facebook__photo_privacy_key), photoPrivacy);
+            editor.putString(mContext.getString(R.string.wings_facebook__photo_privacy_key), photoPrivacy);
         }
-        editor.putString(mContext.getString(R.string.facebook__album_name_key), albumName);
-        editor.putString(mContext.getString(R.string.facebook__album_graph_path_key), albumGraphPath);
+        editor.putString(mContext.getString(R.string.wings_facebook__album_name_key), albumName);
+        editor.putString(mContext.getString(R.string.wings_facebook__album_graph_path_key), albumGraphPath);
 
         // Set preference to linked.
-        editor.putBoolean(mContext.getString(R.string.facebook__link_key), true);
+        editor.putBoolean(mContext.getString(R.string.wings_facebook__link_key), true);
         editor.apply();
     }
 
@@ -506,13 +506,13 @@ public class FacebookEndpoint extends WingsEndpoint {
      */
     private void removeAccountParams() {
         Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-        editor.remove(mContext.getString(R.string.facebook__account_name_key));
-        editor.remove(mContext.getString(R.string.facebook__photo_privacy_key));
-        editor.remove(mContext.getString(R.string.facebook__album_name_key));
-        editor.remove(mContext.getString(R.string.facebook__album_graph_path_key));
+        editor.remove(mContext.getString(R.string.wings_facebook__account_name_key));
+        editor.remove(mContext.getString(R.string.wings_facebook__photo_privacy_key));
+        editor.remove(mContext.getString(R.string.wings_facebook__album_name_key));
+        editor.remove(mContext.getString(R.string.wings_facebook__album_graph_path_key));
 
         // Set preference to unlinked.
-        editor.putBoolean(mContext.getString(R.string.facebook__link_key), false);
+        editor.putBoolean(mContext.getString(R.string.wings_facebook__link_key), false);
         editor.apply();
     }
 
@@ -523,7 +523,7 @@ public class FacebookEndpoint extends WingsEndpoint {
      */
     private String optLinkedPhotoPrivacy() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.facebook__photo_privacy_key), null);
+        return preferences.getString(mContext.getString(R.string.wings_facebook__photo_privacy_key), null);
     }
 
     /**
@@ -533,7 +533,7 @@ public class FacebookEndpoint extends WingsEndpoint {
      */
     private String getLinkedAlbumGraphPath() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.facebook__album_graph_path_key), null);
+        return preferences.getString(mContext.getString(R.string.wings_facebook__album_graph_path_key), null);
     }
 
     /**
@@ -561,7 +561,7 @@ public class FacebookEndpoint extends WingsEndpoint {
      */
     private String getLinkedAlbumName() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.facebook__album_name_key), null);
+        return preferences.getString(mContext.getString(R.string.wings_facebook__album_name_key), null);
     }
 
     //
@@ -666,7 +666,7 @@ public class FacebookEndpoint extends WingsEndpoint {
     @Override
     public boolean isLinked() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getBoolean(mContext.getString(R.string.facebook__link_key), false);
+        return preferences.getBoolean(mContext.getString(R.string.wings_facebook__link_key), false);
     }
 
     @Override
@@ -724,7 +724,7 @@ public class FacebookEndpoint extends WingsEndpoint {
     @Override
     public String getLinkedAccountName() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.facebook__account_name_key), null);
+        return preferences.getString(mContext.getString(R.string.wings_facebook__account_name_key), null);
     }
 
     @Override
@@ -733,7 +733,7 @@ public class FacebookEndpoint extends WingsEndpoint {
         String accountName = getLinkedAccountName();
         String albumName = getLinkedAlbumName();
         if (accountName != null && accountName.length() > 0 && albumName != null && albumName.length() > 0) {
-            destinationDescription = mContext.getString(R.string.facebook__destination_description, accountName, albumName);
+            destinationDescription = mContext.getString(R.string.wings_facebook__destination_description, accountName, albumName);
         }
         return destinationDescription;
     }

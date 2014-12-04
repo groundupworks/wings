@@ -56,8 +56,8 @@ public class FacebookPrivacyDialogFragment extends DialogFragment {
 
         }
 
-        return dialogBuilder.setTitle(getString(R.string.facebook__privacy__dialog_title))
-                .setItems(R.array.facebook_privacy__privacies, new OnClickListener() {
+        return dialogBuilder.setTitle(getString(R.string.wings_facebook__privacy__dialog_title))
+                .setItems(R.array.wings_facebook_privacy__privacies, new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         handlePhotoPrivacySelection(which, albumName, albumGraphPath);
@@ -80,17 +80,17 @@ public class FacebookPrivacyDialogFragment extends DialogFragment {
         FacebookSettingsActivity activity = (FacebookSettingsActivity) getActivity();
         if (activity != null && !activity.isFinishing()) {
             // Convert privacy index to privacy setting to store.
-            String[] privacyArray = getResources().getStringArray(R.array.facebook_privacy__privacies);
+            String[] privacyArray = getResources().getStringArray(R.array.wings_facebook_privacy__privacies);
             String privacyString = privacyArray[photoPrivacyIndex];
 
             String photoPrivacy = null;
-            if (getString(R.string.facebook__privacy__photo_privacy_self).equals(privacyString)) {
+            if (getString(R.string.wings_facebook__privacy__photo_privacy_self).equals(privacyString)) {
                 photoPrivacy = FacebookEndpoint.PHOTO_PRIVACY_SELF;
-            } else if (getString(R.string.facebook__privacy__photo_privacy_friends).equals(privacyString)) {
+            } else if (getString(R.string.wings_facebook__privacy__photo_privacy_friends).equals(privacyString)) {
                 photoPrivacy = FacebookEndpoint.PHOTO_PRIVACY_FRIENDS;
-            } else if (getString(R.string.facebook__privacy__photo_privacy_friends_of_friends).equals(privacyString)) {
+            } else if (getString(R.string.wings_facebook__privacy__photo_privacy_friends_of_friends).equals(privacyString)) {
                 photoPrivacy = FacebookEndpoint.PHOTO_PRIVACY_FRIENDS_OF_FRIENDS;
-            } else if (getString(R.string.facebook__privacy__photo_privacy_everyone).equals(privacyString)) {
+            } else if (getString(R.string.wings_facebook__privacy__photo_privacy_everyone).equals(privacyString)) {
                 photoPrivacy = FacebookEndpoint.PHOTO_PRIVACY_EVERYONE;
             }
 
