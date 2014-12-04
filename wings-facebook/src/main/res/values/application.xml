@@ -3,8 +3,8 @@
 <!-- Override with values specific to your application -->
 <resources>
     <!-- Your app id from Facebook -->
-    <string name="facebook__app_id">null</string>
+    <string name="wings_facebook__app_id">null</string>
 
     <!-- The name of the default album to be created for storing photos -->
-    <string name="facebook__app_album_default_name">null</string>
+    <string name="wings_facebook__app_album_default_name">null</string>
 </resources>

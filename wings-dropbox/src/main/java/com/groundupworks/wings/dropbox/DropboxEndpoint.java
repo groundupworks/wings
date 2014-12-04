@@ -192,7 +192,7 @@ public class DropboxEndpoint extends WingsEndpoint {
         boolean folderCreated = false;
         if (dropboxApi != null) {
             try {
-                dropboxApi.createFolder(mContext.getString(R.string.dropbox__photo_folder));
+                dropboxApi.createFolder(mContext.getString(R.string.wings_dropbox__photo_folder));
                 folderCreated = true;
             } catch (DropboxException e) {
                 // Consider the folder created if the folder already exists.
@@ -232,7 +232,7 @@ public class DropboxEndpoint extends WingsEndpoint {
         String shareUrl = null;
         if (dropboxApi != null) {
             try {
-                shareUrl = dropboxApi.share("/" + mContext.getString(R.string.dropbox__photo_folder)).url;
+                shareUrl = dropboxApi.share("/" + mContext.getString(R.string.wings_dropbox__photo_folder)).url;
             } catch (DropboxException e) {
                 // Do nothing.
             }
@@ -305,8 +305,8 @@ public class DropboxEndpoint extends WingsEndpoint {
     public void startLinkRequest(Activity activity, Fragment fragment) {
         mIsLinkRequested = true;
 
-        AppKeyPair appKeyPair = new AppKeyPair(mContext.getString(R.string.dropbox__app_key),
-                mContext.getString(R.string.dropbox__app_secret));
+        AppKeyPair appKeyPair = new AppKeyPair(mContext.getString(R.string.wings_dropbox__app_key),
+                mContext.getString(R.string.wings_dropbox__app_secret));
         AndroidAuthSession session = new AndroidAuthSession(appKeyPair);
         synchronized (mDropboxApiLock) {
             mDropboxApi = new DropboxAPI<AndroidAuthSession>(session);
@@ -398,8 +398,8 @@ public class DropboxEndpoint extends WingsEndpoint {
 
             if (!shareRequests.isEmpty()) {
                 // Start new session with the persisted access token.
-                AppKeyPair appKeys = new AppKeyPair(mContext.getString(R.string.dropbox__app_key),
-                        mContext.getString(R.string.dropbox__app_secret));
+                AppKeyPair appKeys = new AppKeyPair(mContext.getString(R.string.wings_dropbox__app_key),
+                        mContext.getString(R.string.wings_dropbox__app_secret));
                 AndroidAuthSession session = new AndroidAuthSession(appKeys);
                 session.setOAuth2AccessToken(accessToken);
                 DropboxAPI<AndroidAuthSession> dropboxApi = new DropboxAPI<AndroidAuthSession>(session);
@@ -412,7 +412,7 @@ public class DropboxEndpoint extends WingsEndpoint {
                         inputStream = new FileInputStream(file);
 
                         // Upload file.
-                        dropboxApi.putFile("/" + mContext.getString(R.string.dropbox__photo_folder) + "/" + file.getName(), inputStream, file.length(), null,
+                        dropboxApi.putFile("/" + mContext.getString(R.string.wings_dropbox__photo_folder) + "/" + file.getName(), inputStream, file.length(), null,
                                 null);
 
                         // Mark as successfully processed.

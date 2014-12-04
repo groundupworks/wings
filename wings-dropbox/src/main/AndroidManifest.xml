@@ -7,7 +7,7 @@
             android:configChanges="orientation|keyboard"
             android:launchMode="singleTask">
             <intent-filter>
-                <data android:scheme="@string/dropbox__app_scheme" />
+                <data android:scheme="@string/wings_dropbox__app_scheme" />
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.BROWSABLE" />

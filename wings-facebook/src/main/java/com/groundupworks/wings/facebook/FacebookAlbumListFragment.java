@@ -217,7 +217,7 @@ public class FacebookAlbumListFragment extends ListFragment {
                     // created.
                     if (appAlbum == null) {
                         appAlbum = new Object[]{APP_ALBUM_CURSOR_ID,
-                                activity.getString(R.string.facebook__app_album_default_name),
+                                activity.getString(R.string.wings_facebook__app_album_default_name),
                                 FacebookEndpoint.APP_ALBUM_GRAPH_PATH, FacebookEndpoint.APP_ALBUM_PRIVACY};
                     }
 
