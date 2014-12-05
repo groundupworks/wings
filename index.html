@@ -81,13 +81,13 @@
 <p>You will find <strong>values/application.xml</strong> in some of the endpoint modules. This is where you specify credentials and configurations specific to your application. Take the Facebook endpoint for example, the following keys need to be overridden by your application.</p>
 
 <pre><code>&lt;!-- Your app id from Facebook --&gt;
-&lt;string name="facebook__app_id"&gt;null&lt;/string&gt;
+&lt;string name="wings_facebook__app_id"&gt;null&lt;/string&gt;
 
 &lt;!-- The name of the default album to be created for storing photos --&gt;
-&lt;string name="facebook__app_album_default_name"&gt;null&lt;/string&gt;
+&lt;string name="wings_facebook__app_album_default_name"&gt;null&lt;/string&gt;
 </code></pre>
 
-<p>You will need to sign up as a <a href="https://developers.facebook.com">Facebook Developer</a> and register your application to obtain an app ID, then map that value to a string resource in your application with the key <code>facebook__app_id</code>. The default album name will be overridden the same way. Note that the values you specify in your application will override the <code>null</code> specified in the library, so you should not directly modify <strong>application.xml</strong> in Wings.</p>
+<p>You will need to sign up as a <a href="https://developers.facebook.com">Facebook Developer</a> and register your application to obtain an app ID, then map that value to a string resource in your application with the key <code>wings_facebook__app_id</code>. The default album name will be overridden the same way. Note that the values you specify in your application will override the <code>null</code> specified in the library, so you should not directly modify <strong>application.xml</strong> in Wings.</p>
 
 <p>The Dropbox endpoint will be <a href="https://www.dropbox.com/developers">a similar story</a>. The integration instructions from the service providers may ask you to add stuff to your <strong>AndroidManifest.xml</strong>, you can skip that when using Wings, because the endpoint AAR will take care of that for you by merging its manifest. All you need to do is override the values in each <strong>application.xml</strong>.</p>
 
@@ -119,6 +119,24 @@ Wings.init(module, FacebookEndpoint.class, DropboxEndpoint.class, GoogleCloudPri
 </code></pre>
 
 <pre><code>Wings.getEndpoint(FacebookEndpoint.class).onActivityResultImpl(activity, fragment, requestCode, resultCode, data);
+</code></pre>
+
+<h3>
+<a id="subscribing-to-link-state-changes" class="anchor" href="#subscribing-to-link-state-changes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subscribing to link state changes</h3>
+
+<p>Each endpoint emits its own <code>LinkEvent</code> to the <a href="http://square.github.io/otto/">Otto</a> <code>Bus</code>. A subscriber will receive the event at the time of subscription, and whenever the link state of that endpoint changes, until unsubscribed.</p>
+
+<p>To listen to link state changes of the Facebook and Dropbox endpoints, implement the following subscription methods in your <code>Activity</code> or <code>Fragment</code>, then call <code>Wings#subscribe()</code> and <code>Wings#unsubscribe()</code> in your <code>onResume()</code> and <code>onPause()</code> respectively. This will ensure your UI is initialized with the correct state, and properly updates with each link state change.</p>
+
+<pre><code>@Subscribe
+public void handleLinkEvent(FacebookEndpoint.LinkEvent event) {
+    // Update Facebook link state UI with event.isLinked().
+}
+
+@Subscribe
+public void handleLinkEvent(DropboxEndpoint.LinkEvent event) {
+    // Update Dropbox link state UI with event.isLinked().
+}
 </code></pre>
 
 <h3>
