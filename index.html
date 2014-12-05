@@ -122,20 +122,20 @@ Wings.init(module, FacebookEndpoint.class, DropboxEndpoint.class, GoogleCloudPri
 </code></pre>
 
 <h3>
-<a id="subscribing-to-link-state-changes" class="anchor" href="#subscribing-to-link-state-changes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subscribing to link state changes</h3>
+<a id="subscribing-to-a-link-state" class="anchor" href="#subscribing-to-a-link-state" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subscribing to a link state</h3>
 
-<p>Each endpoint emits its own <code>LinkEvent</code> to the <a href="http://square.github.io/otto/">Otto</a> <code>Bus</code>. A subscriber will receive the event at the time of subscription, and whenever the link state of that endpoint changes, until unsubscribed.</p>
+<p>Each endpoint emits its own <code>LinkEvent</code> to the <a href="http://square.github.io/otto/">Otto</a> <code>Bus</code>. A subscriber will receive the event at the time of subscription, and whenever the link state of that endpoint changes, until it unsubscribes.</p>
 
-<p>To listen to link state changes of the Facebook and Dropbox endpoints, implement the following subscription methods in your <code>Activity</code> or <code>Fragment</code>, then call <code>Wings#subscribe()</code> and <code>Wings#unsubscribe()</code> in your <code>onResume()</code> and <code>onPause()</code> respectively. This will ensure your UI is initialized with the correct state, and properly updates with each link state change.</p>
+<p>To subscribe to the link state of the Facebook and Dropbox endpoints, implement the following <code>@Subscribe</code>-annotated methods in your <code>Activity</code> or <code>Fragment</code>, then call <code>Wings#subscribe()</code> and <code>Wings#unsubscribe()</code> in the <code>onResume()</code> and <code>onPause()</code> respectively. This will ensure the UI is initialized with the correct state, and properly updates when state changes occur.</p>
 
 <pre><code>@Subscribe
 public void handleLinkEvent(FacebookEndpoint.LinkEvent event) {
-    // Update Facebook link state UI with event.isLinked().
+    // Update Facebook UI with event.isLinked()
 }
 
 @Subscribe
 public void handleLinkEvent(DropboxEndpoint.LinkEvent event) {
-    // Update Dropbox link state UI with event.isLinked().
+    // Update Dropbox UI with event.isLinked()
 }
 </code></pre>
 
