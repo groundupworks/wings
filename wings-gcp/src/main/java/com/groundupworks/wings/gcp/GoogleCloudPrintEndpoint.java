@@ -42,8 +42,8 @@ import retrofit.client.Response;
 import retrofit.mime.TypedFile;
 
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_ACCOUNT;
+import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_MEDIA;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_PRINTER;
-import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_TICKET;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_TOKEN;
 
 /**
@@ -52,6 +52,32 @@ import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA
  * @author David Marques
  */
 public class GoogleCloudPrintEndpoint extends WingsEndpoint {
+
+    private static final String TICKET_WITH_MEDIA = "{\n" +
+            "  \"version\": \"1.0\",\n" +
+            "  \"print\": {\n" +
+            "    \"vendor_ticket_item\": [],\n" +
+            "    \"color\": {\n" +
+            "      \"type\": \"STANDARD_COLOR\"\n" +
+            "    },\n" +
+            "    \"media_size\": {\n" +
+            "      \"width_microns\": 1,\n" +
+            "      \"height_microns\": 1,\n" +
+            "      \"is_continuous_feed\": false,\n" +
+            "      \"vendor_id\" : \"%s\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "}";
+
+    private static final String TICKET = "{\n" +
+            "  \"version\": \"1.0\",\n" +
+            "  \"print\": {\n" +
+            "    \"vendor_ticket_item\": [],\n" +
+            "    \"color\": {\n" +
+            "      \"type\": \"STANDARD_COLOR\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "}";
 
     /**
      * Google Cloud Print endpoint id.
@@ -84,7 +110,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         editor.putBoolean(mContext.getString(R.string.wings_gcp__link_key), false);
         editor.remove(mContext.getString(R.string.wings_gcp__account_name_key));
         editor.remove(mContext.getString(R.string.wings_gcp__printer_identifier_key));
-        editor.remove(mContext.getString(R.string.wings_gcp__ticket));
+        editor.remove(mContext.getString(R.string.wings_gcp__media));
         editor.remove(mContext.getString(R.string.wings_gcp__token));
         editor.apply();
 
@@ -120,15 +146,15 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
             if (resultCode == Activity.RESULT_OK) {
                 String accountName = data.getStringExtra(EXTRA_ACCOUNT);
                 String printerIdentifier = data.getStringExtra(EXTRA_PRINTER);
-                String ticket = data.getStringExtra(EXTRA_TICKET);
+                String media = data.getStringExtra(EXTRA_MEDIA);
                 String token = data.getStringExtra(EXTRA_TOKEN);
 
-                if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier) && !TextUtils.isEmpty(ticket) && !TextUtils.isEmpty(token)) {
+                if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier) && !TextUtils.isEmpty(token)) {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
                     editor.putBoolean(mContext.getString(R.string.wings_gcp__link_key), true);
                     editor.putString(mContext.getString(R.string.wings_gcp__account_name_key), accountName);
                     editor.putString(mContext.getString(R.string.wings_gcp__printer_identifier_key), printerIdentifier);
-                    editor.putString(mContext.getString(R.string.wings_gcp__ticket), ticket);
+                    editor.putString(mContext.getString(R.string.wings_gcp__media), media);
                     editor.putString(mContext.getString(R.string.wings_gcp__token), token);
                     editor.apply();
 
@@ -172,13 +198,12 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         final boolean isLinked = preferences.getBoolean(mContext.getString(R.string.wings_gcp__link_key), false);
         final String accountName = preferences.getString(mContext.getString(R.string.wings_gcp__account_name_key), null);
         final String printerIdentifier = preferences.getString(mContext.getString(R.string.wings_gcp__printer_identifier_key), null);
-        final String ticket = preferences.getString(mContext.getString(R.string.wings_gcp__ticket), null);
+        final String media = preferences.getString(mContext.getString(R.string.wings_gcp__media), null);
         final String token = preferences.getString(mContext.getString(R.string.wings_gcp__token), null);
-
+        final String ticket = !TextUtils.isEmpty(media) ? String.format(TICKET_WITH_MEDIA, media) : TICKET;
         if (isLinked && !TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier) &&
-                !TextUtils.isEmpty(ticket) && !TextUtils.isEmpty(token)) {
+                !TextUtils.isEmpty(token)) {
             final WingsDestination destination = new WingsDestination(DestinationId.PRINT_QUEUE, ENDPOINT_ID);
-
             List<ShareRequest> shareRequests = mDatabase.checkoutShareRequests(destination);
             for (ShareRequest shareRequest : shareRequests) {
                 File file = new File(shareRequest.getFilePath());
