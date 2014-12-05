@@ -200,7 +200,7 @@ public class WingsService extends IntentService {
 
         // Construct notification.
         NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext);
-        Notification notification = builder.setSmallIcon(R.drawable.notification)
+        Notification notification = builder.setSmallIcon(R.drawable.wings__notification)
                 .setContentTitle(wingsNotification.getTitle()).setContentText(wingsNotification.getMessage())
                 .setTicker(wingsNotification.getTicker()).setAutoCancel(true).setWhen(System.currentTimeMillis())
                 .setContentIntent(pendingIntent).build();
