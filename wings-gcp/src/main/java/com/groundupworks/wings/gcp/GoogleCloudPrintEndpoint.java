@@ -200,9 +200,9 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         final String printerIdentifier = preferences.getString(mContext.getString(R.string.wings_gcp__printer_identifier_key), null);
         final String media = preferences.getString(mContext.getString(R.string.wings_gcp__media), null);
         final String token = preferences.getString(mContext.getString(R.string.wings_gcp__token), null);
-        final String ticket = !TextUtils.isEmpty(media) ? String.format(TICKET_WITH_MEDIA, media) : TICKET;
         if (isLinked && !TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier) &&
                 !TextUtils.isEmpty(token)) {
+            final String ticket = !TextUtils.isEmpty(media) ? String.format(TICKET_WITH_MEDIA, media) : TICKET;
             final WingsDestination destination = new WingsDestination(DestinationId.PRINT_QUEUE, ENDPOINT_ID);
             List<ShareRequest> shareRequests = mDatabase.checkoutShareRequests(destination);
             for (ShareRequest shareRequest : shareRequests) {

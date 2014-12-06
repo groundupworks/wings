@@ -135,7 +135,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
         mPrinterSpinner = (Spinner) findViewById(R.id.gcp_activity_settings_spinner_printers);
         mPrinterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view,  int position, long id) {
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
                 onPrinterSelected(position);
             }
 
@@ -306,14 +306,14 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
         try {
             mediaSizes.addAll(JsonPath.parse(response.getBody().in())
                     .read(OPTIONS_JSON_PATH, MediaSizeList.class));
-
         } catch (IOException e) {
-            e.printStackTrace();
+            // Do nothing.
         }
         return mediaSizes;
     }
 
-    static class MediaSizeList extends ArrayList<MediaSize> {}
+    static class MediaSizeList extends ArrayList<MediaSize> {
+    }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     static class MediaSize {

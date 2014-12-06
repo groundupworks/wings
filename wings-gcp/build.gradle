@@ -29,7 +29,6 @@ dependencies {
         exclude module: 'support-v4'
         exclude module: 'rxjava-android'
     }
-    compile 'com.jakewharton:butterknife:5.1.2'
     compile 'com.netflix.rxjava:rxjava-android:0.20.6'
     compile 'com.jayway.jsonpath:json-path:1.2.0'
     compile project(':wings')
