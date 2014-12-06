@@ -3,6 +3,6 @@
     <string name="wings_gcp__link_key">wings_gcp__link_key</string>
     <string name="wings_gcp__account_name_key">wings_gcp__account_name_key</string>
     <string name="wings_gcp__printer_identifier_key">wings_gcp__printer_identifier_key</string>
-    <string name="wings_gcp__ticket">wings_gcp__ticket</string>
+    <string name="wings_gcp__media">wings_gcp__media</string>
     <string name="wings_gcp__token">wings_gcp__token</string>
 </resources>

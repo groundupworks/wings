@@ -12,10 +12,18 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/gcp_activity_settings_spinner_media_sizes"
+        android:layout_below="@id/gcp_activity_settings_spinner_printers"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"/>
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/gcp_activity_settings_spinner_printers"
+        android:layout_below="@id/gcp_activity_settings_spinner_media_sizes"
         android:text="@string/wings_gcp__settings__button_link_text"
         android:id="@+id/gcp_activity_settings_button_link" />
 
