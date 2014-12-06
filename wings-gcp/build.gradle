@@ -30,6 +30,8 @@ dependencies {
         exclude module: 'rxjava-android'
     }
     compile 'com.netflix.rxjava:rxjava-android:0.20.6'
-    compile 'com.jayway.jsonpath:json-path:1.2.0'
+    compile ('com.jayway.jsonpath:json-path:1.2.0') {
+        exclude module: 'asm'
+    }
     compile project(':wings')
 }
