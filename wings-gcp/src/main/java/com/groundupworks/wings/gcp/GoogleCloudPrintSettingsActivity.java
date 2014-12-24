@@ -98,6 +98,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
 
     static final String EXTRA_ACCOUNT = "account";
     static final String EXTRA_PRINTER = "printer";
+    static final String EXTRA_PRINTER_NAME = "printer_name";
     static final String EXTRA_TOKEN = "token";
     static final String EXTRA_MEDIA = "media";
 
@@ -159,6 +160,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
                     if (!TextUtils.isEmpty(id) && !TextUtils.isEmpty(account) && !TextUtils.isEmpty(token)) {
                         final Intent intent = new Intent();
                         intent.putExtra(EXTRA_PRINTER, id);
+                        intent.putExtra(EXTRA_PRINTER_NAME, selectedPrinter.getName());
                         intent.putExtra(EXTRA_ACCOUNT, account);
                         intent.putExtra(EXTRA_TOKEN, token);
                         if (selectedMedia != null) {
