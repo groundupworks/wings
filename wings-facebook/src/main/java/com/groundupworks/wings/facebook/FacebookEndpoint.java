@@ -43,9 +43,9 @@ import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 import com.facebook.model.GraphObject;
 import com.groundupworks.wings.IWingsNotification;
-import com.groundupworks.wings.WingsDestination;
 import com.groundupworks.wings.WingsEndpoint;
 import com.groundupworks.wings.WingsLinkEvent;
+import com.groundupworks.wings.core.Destination;
 import com.groundupworks.wings.core.ShareRequest;
 import com.squareup.otto.Produce;
 
@@ -658,7 +658,7 @@ public class FacebookEndpoint extends WingsEndpoint {
 
             @Override
             public void run() {
-                mDatabase.deleteShareRequests(new WingsDestination(DestinationId.PROFILE, ENDPOINT_ID));
+                mDatabase.deleteShareRequests(new Destination(DestinationId.PROFILE, ENDPOINT_ID));
             }
         });
     }
@@ -722,20 +722,15 @@ public class FacebookEndpoint extends WingsEndpoint {
     }
 
     @Override
-    public String getLinkedAccountName() {
+    public LinkInfo getLinkInfo() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.wings_facebook__account_name_key), null);
-    }
-
-    @Override
-    public String getDestinationDescription(int destinationId) {
-        String destinationDescription = null;
-        String accountName = getLinkedAccountName();
+        String accountName = preferences.getString(mContext.getString(R.string.wings_facebook__account_name_key), null);
         String albumName = getLinkedAlbumName();
         if (accountName != null && accountName.length() > 0 && albumName != null && albumName.length() > 0) {
-            destinationDescription = mContext.getString(R.string.wings_facebook__destination_description, accountName, albumName);
+            String destinationDescription = mContext.getString(R.string.wings_facebook__destination_description, accountName, albumName);
+            return new LinkInfo(accountName, DestinationId.PROFILE, destinationDescription);
         }
-        return destinationDescription;
+        return null;
     }
 
     @Override
@@ -748,7 +743,7 @@ public class FacebookEndpoint extends WingsEndpoint {
         String albumGraphPath = getLinkedAlbumGraphPath();
         if (albumName != null && albumGraphPath != null) {
             // Get share requests for Facebook.
-            WingsDestination destination = new WingsDestination(DestinationId.PROFILE, ENDPOINT_ID);
+            Destination destination = new Destination(DestinationId.PROFILE, ENDPOINT_ID);
             List<ShareRequest> shareRequests = mDatabase.checkoutShareRequests(destination);
             int shared = 0;
             String intentUri = null;
@@ -858,7 +853,7 @@ public class FacebookEndpoint extends WingsEndpoint {
     /**
      * The list of destination ids.
      */
-    public interface DestinationId {
+    public interface DestinationId extends WingsEndpoint.DestinationId {
 
         /**
          * The personal Facebook profile.

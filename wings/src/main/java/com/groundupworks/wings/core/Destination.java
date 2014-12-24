@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.groundupworks.wings;
+package com.groundupworks.wings.core;
 
 /**
  * A destination that Wings can share to.
  *
  * @author Benedict Lau
  */
-public class WingsDestination {
+public class Destination {
 
     private static final int FOUR_BYTES = 0xffff;
 
@@ -35,17 +35,16 @@ public class WingsDestination {
     private final int mEndpointId;
 
     /**
-     * Creates a new instance of {@link com.groundupworks.wings.WingsDestination} from a hash generated
-     * using {@link WingsDestination#getHash()}.
+     * Creates a new instance of {@link Destination} from a hash generated
+     * using {@link Destination#getHash()}.
      *
      * @param hash the hash.
      */
-    public static final WingsDestination from(int hash) {
+    public static final Destination from(int hash) {
         final int id = (hash >> FOUR_BYTES) & FOUR_BYTES;
         final int endpointId = hash & FOUR_BYTES;
-        return new WingsDestination(id, endpointId);
+        return new Destination(id, endpointId);
     }
-
 
     /**
      * Constructor.
@@ -53,7 +52,7 @@ public class WingsDestination {
      * @param id         the destination id for the share.
      * @param endpointId the endpoint id for the share.
      */
-    public WingsDestination(int id, int endpointId) {
+    public Destination(int id, int endpointId) {
         mId = id;
         mEndpointId = endpointId;
     }

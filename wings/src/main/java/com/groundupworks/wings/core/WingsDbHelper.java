@@ -23,7 +23,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.groundupworks.wings.IWingsLogger;
-import com.groundupworks.wings.WingsDestination;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -155,7 +154,7 @@ public class WingsDbHelper extends SQLiteOpenHelper {
      * @param destination the destination of the share.
      * @return true if successful; false otherwise.
      */
-    public synchronized boolean createShareRequest(String filePath, WingsDestination destination) {
+    public synchronized boolean createShareRequest(String filePath, Destination destination) {
         boolean isSuccessful = false;
 
         SQLiteDatabase db = null;
@@ -195,7 +194,7 @@ public class WingsDbHelper extends SQLiteOpenHelper {
      * @param destination the destination of the {@link ShareRequest} to checkout.
      * @return the list of {@link ShareRequest}; may be empty.
      */
-    public synchronized List<ShareRequest> checkoutShareRequests(WingsDestination destination) {
+    public synchronized List<ShareRequest> checkoutShareRequests(Destination destination) {
         List<ShareRequest> shareRequests = new ArrayList<ShareRequest>();
 
         SQLiteDatabase db = null;
@@ -223,7 +222,7 @@ public class WingsDbHelper extends SQLiteOpenHelper {
                     if (db.update(ShareRequestTable.NAME, values, WHERE_CLAUSE_BY_ID,
                             new String[]{String.valueOf(id)}) > 0) {
                         // Add record to list.
-                        WingsDestination resultDestination = WingsDestination.from(destinationHash);
+                        Destination resultDestination = Destination.from(destinationHash);
                         shareRequests.add(new ShareRequest(id, filePath, resultDestination));
 
                         sLogger.log(WingsDbHelper.class, "checkoutShareRequests", "id=" + id + " filePath="
@@ -248,7 +247,7 @@ public class WingsDbHelper extends SQLiteOpenHelper {
      *
      * @param destination the destination of the list of {@link ShareRequest} to delete.
      */
-    public synchronized void deleteShareRequests(WingsDestination destination) {
+    public synchronized void deleteShareRequests(Destination destination) {
         SQLiteDatabase db = null;
         try {
             db = getWritableDatabase();

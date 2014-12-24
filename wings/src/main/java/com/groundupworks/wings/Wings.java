@@ -19,6 +19,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Looper;
 
+import com.groundupworks.wings.core.Destination;
 import com.groundupworks.wings.core.WingsDbHelper;
 import com.groundupworks.wings.core.WingsInjector;
 import com.groundupworks.wings.core.WingsService;
@@ -168,21 +169,22 @@ public final class Wings {
     }
 
     /**
-     * Shares an image to the specified destination at an endpoint. The client is responsible for ensuring
-     * that the file exists, and the destination id valid for that endpoint.
+     * Shares an image to the specified endpoint. The client is responsible for ensuring that the file
+     * exists and the endpoint is linked.
      *
      * @param filePath      the local path to the file to share.
-     * @param destinationId the destination id to share to.
      * @param endpointClazz the {@link java.lang.Class} of the endpoint to share to.
      * @return {@code true} if successful; {@code false} otherwise.
      * @throws IllegalStateException Wings must be initialized. See {@link Wings#init(IWingsModule, Class[])}.
      */
-    public static boolean share(String filePath, int destinationId, Class<? extends WingsEndpoint> endpointClazz) throws IllegalStateException {
+    public static boolean share(String filePath, Class<? extends WingsEndpoint> endpointClazz) throws IllegalStateException {
         if (!sIsInitialized) {
             throw new IllegalStateException("Wings must be initialized. See Wings#init().");
         }
         WingsEndpoint endpoint = Wings.getEndpoint(endpointClazz);
-        if (endpoint != null && WingsInjector.getDatabase().createShareRequest(filePath, new WingsDestination(destinationId, endpoint.getEndpointId()))) {
+        WingsEndpoint.LinkInfo linkInfo = endpoint.getLinkInfo();
+        if (endpoint != null && linkInfo != null
+                && WingsInjector.getDatabase().createShareRequest(filePath, new Destination(linkInfo.mDestinationId, endpoint.getEndpointId()))) {
             WingsService.startWakefulService(WingsInjector.getApplicationContext());
             return true;
         }
