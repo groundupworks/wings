@@ -16,6 +16,7 @@
 package com.groundupworks.wings.facebook;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 
 /**
  * A model object to contain Facebook settings. An instance of {@link FacebookSettings} cannot be directly constructed,
@@ -30,39 +31,51 @@ public class FacebookSettings {
     // Bundle keys.
     //
 
-    private static final String BUNDLE_KEY_ACCOUNT_NAME = "accountName";
+    private static final String BUNDLE_KEY_DESTINATION_ID = "destinationId";
 
-    private static final String BUNDLE_KEY_PHOTO_PRIVACY = "photoPrivacy";
+    private static final String BUNDLE_KEY_ACCOUNT_NAME = "accountName";
 
     private static final String BUNDLE_KEY_ALBUM_NAME = "albumName";
 
     private static final String BUNDLE_KEY_ALBUM_GRAPH_PATH = "albumGraphPath";
 
+    private static final String BUNDLE_KEY_PAGE_ACCESS_TOKEN = "pageAccessToken";
+
+    private static final String BUNDLE_KEY_PHOTO_PRIVACY = "photoPrivacy";
+
     //
-    // Account settings that must be non-null and non-empty.
+    // Account settings.
     //
+
+    private int mDestinationId;
 
     private String mAccountName;
-
-    private String mPhotoPrivacy = null;
 
     private String mAlbumName;
 
     private String mAlbumGraphPath;
 
+    private String mPageAccessToken = null;
+
+    private String mPhotoPrivacy = null;
+
     /**
      * Private constructor.
      *
-     * @param accountName    the user name associated with the account.
-     * @param photoPrivacy   the privacy level of shared photos. Only used for albums with 'custom' privacy level. May be null.
-     * @param albumName      the name of the album to share to.
-     * @param albumGraphPath the graph path of the album to share to.
+     * @param destinationId   the destination id.
+     * @param accountName     the user name associated with the account.
+     * @param albumName       the name of the album to share to.
+     * @param albumGraphPath  the graph path of the album to share to.
+     * @param pageAccessToken the Page access token. Only used for sharing to Pages. May be null.
+     * @param photoPrivacy    the privacy level of shared photos. Only used for albums with 'custom' privacy level. May be null.
      */
-    private FacebookSettings(String accountName, String photoPrivacy, String albumName, String albumGraphPath) {
+    private FacebookSettings(int destinationId, String accountName, String albumName, String albumGraphPath, String pageAccessToken, String photoPrivacy) {
+        mDestinationId = destinationId;
         mAccountName = accountName;
-        mPhotoPrivacy = photoPrivacy;
         mAlbumName = albumName;
         mAlbumGraphPath = albumGraphPath;
+        mPageAccessToken = pageAccessToken;
+        mPhotoPrivacy = photoPrivacy;
     }
 
     //
@@ -72,18 +85,23 @@ public class FacebookSettings {
     /**
      * Creates a new {@link FacebookSettings} instance.
      *
-     * @param accountName    the user name associated with the account.
-     * @param photoPrivacy   the privacy level of shared photos. Only used for albums with 'custom' privacy level. May be null.
-     * @param albumName      the name of the album to share to.
-     * @param albumGraphPath the graph path of the album to share to.
+     * @param destinationId   the destination id.
+     * @param accountName     the user name associated with the account.
+     * @param albumName       the name of the album to share to.
+     * @param albumGraphPath  the graph path of the album to share to.
+     * @param pageAccessToken the Page access token. Only used for sharing to Pages. May be null.
+     * @param photoPrivacy    the privacy level of shared photos. Only used for albums with 'custom' privacy level. May be null.
      * @return a new {@link FacebookSettings} instance; or null if any of the params are invalid.
      */
-    static FacebookSettings newInstance(String accountName, String photoPrivacy, String albumName, String albumGraphPath) {
+    static FacebookSettings newInstance(int destinationId, String accountName, String albumName, String albumGraphPath, String pageAccessToken, String photoPrivacy) {
         FacebookSettings settings = null;
 
-        if (accountName != null && accountName.length() > 0 && albumName != null && albumName.length() > 0
-                && albumGraphPath != null && albumGraphPath.length() > 0) {
-            settings = new FacebookSettings(accountName, photoPrivacy, albumName, albumGraphPath);
+        if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(albumName) && !TextUtils.isEmpty(albumGraphPath)) {
+            if (destinationId == FacebookEndpoint.DestinationId.PROFILE) {
+                settings = new FacebookSettings(destinationId, accountName, albumName, albumGraphPath, pageAccessToken, photoPrivacy);
+            } else if (destinationId == FacebookEndpoint.DestinationId.PAGE && !TextUtils.isEmpty(pageAccessToken)) {
+                settings = new FacebookSettings(destinationId, accountName, albumName, albumGraphPath, pageAccessToken, photoPrivacy);
+            }
         }
 
         return settings;
@@ -98,13 +116,19 @@ public class FacebookSettings {
     static FacebookSettings newInstance(Bundle bundle) {
         FacebookSettings settings = null;
 
+        int destinationId = bundle.getInt(BUNDLE_KEY_DESTINATION_ID);
         String accountName = bundle.getString(BUNDLE_KEY_ACCOUNT_NAME);
-        String photoPrivacy = bundle.getString(BUNDLE_KEY_PHOTO_PRIVACY);
         String albumName = bundle.getString(BUNDLE_KEY_ALBUM_NAME);
         String albumGraphPath = bundle.getString(BUNDLE_KEY_ALBUM_GRAPH_PATH);
-        if (accountName != null && accountName.length() > 0 && albumName != null && albumName.length() > 0
-                && albumGraphPath != null && albumGraphPath.length() > 0) {
-            settings = new FacebookSettings(accountName, photoPrivacy, albumName, albumGraphPath);
+        String pageAccessToken = bundle.getString(BUNDLE_KEY_PAGE_ACCESS_TOKEN);
+        String photoPrivacy = bundle.getString(BUNDLE_KEY_PHOTO_PRIVACY);
+
+        if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(albumName) && !TextUtils.isEmpty(albumGraphPath)) {
+            if (destinationId == FacebookEndpoint.DestinationId.PROFILE) {
+                settings = new FacebookSettings(destinationId, accountName, albumName, albumGraphPath, pageAccessToken, photoPrivacy);
+            } else if (destinationId == FacebookEndpoint.DestinationId.PAGE && !TextUtils.isEmpty(pageAccessToken)) {
+                settings = new FacebookSettings(destinationId, accountName, albumName, albumGraphPath, pageAccessToken, photoPrivacy);
+            }
         }
 
         return settings;
@@ -117,14 +141,25 @@ public class FacebookSettings {
      */
     Bundle toBundle() {
         Bundle bundle = new Bundle();
+        bundle.putInt(BUNDLE_KEY_DESTINATION_ID, mDestinationId);
         bundle.putString(BUNDLE_KEY_ACCOUNT_NAME, mAccountName);
-        if (mPhotoPrivacy != null && mPhotoPrivacy.length() > 0) {
-            bundle.putString(BUNDLE_KEY_PHOTO_PRIVACY, mPhotoPrivacy);
-        }
         bundle.putString(BUNDLE_KEY_ALBUM_NAME, mAlbumName);
         bundle.putString(BUNDLE_KEY_ALBUM_GRAPH_PATH, mAlbumGraphPath);
+        if (!TextUtils.isEmpty(mPageAccessToken)) {
+            bundle.putString(BUNDLE_KEY_PAGE_ACCESS_TOKEN, mPageAccessToken);
+        }
+        if (!TextUtils.isEmpty(mPhotoPrivacy)) {
+            bundle.putString(BUNDLE_KEY_PHOTO_PRIVACY, mPhotoPrivacy);
+        }
 
         return bundle;
+    }
+
+    /**
+     * @return the destination id.
+     */
+    int getDestinationId() {
+        return mDestinationId;
     }
 
     /**
@@ -132,13 +167,6 @@ public class FacebookSettings {
      */
     String getAccountName() {
         return mAccountName;
-    }
-
-    /**
-     * @return the privacy level of shared photos. Only used for albums with 'custom' privacy level. May be null.
-     */
-    String optPhotoPrivacy() {
-        return mPhotoPrivacy;
     }
 
     /**
@@ -153,5 +181,19 @@ public class FacebookSettings {
      */
     String getAlbumGraphPath() {
         return mAlbumGraphPath;
+    }
+
+    /**
+     * @return the Page access token. Only used for sharing to Pages. May be null.
+     */
+    String optPageAccessToken() {
+        return mPageAccessToken;
+    }
+
+    /**
+     * @return the privacy level of shared photos. Only used for albums with 'custom' privacy level. May be null.
+     */
+    String optPhotoPrivacy() {
+        return mPhotoPrivacy;
     }
 }

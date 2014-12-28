@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.facebook.FacebookException;
@@ -96,6 +97,11 @@ public class FacebookEndpoint extends WingsEndpoint {
     private static final String PERMISSION_USER_PHOTOS = "user_photos";
 
     /**
+     * Permission to manage Pages.
+     */
+    private static final String PERMISSION_MANAGE_PAGES = "manage_pages";
+
+    /**
      * Permission to publish content.
      */
     private static final String PERMISSION_PUBLISH_ACTIONS = "publish_actions";
@@ -116,6 +122,49 @@ public class FacebookEndpoint extends WingsEndpoint {
     private static final int STATE_PUBLISH_PERMISSIONS_REQUEST = 1;
 
     private static final int STATE_SETTINGS_REQUEST = 2;
+
+    //
+    // Account listing params.
+    //
+
+    /**
+     * The graph path to list admin accounts for Pages.
+     */
+    private static final String ACCOUNTS_LISTING_GRAPH_PATH = "me/accounts";
+
+    /**
+     * The key for params to request.
+     */
+    private static final String ACCOUNTS_LISTING_FEILDS_KEY = "fields";
+
+    /**
+     * The value for params to request.
+     */
+    private static final String ACCOUNTS_LISTING_FIELDS_VALUE = "id,name,access_token,perms";
+
+    //
+    // Account listing results.
+    //
+
+    static final String ACCOUNTS_LISTING_RESULT_DATA_KEY = "data";
+
+    static final String ACCOUNTS_LISTING_FIELD_ID = "id";
+
+    static final String ACCOUNTS_LISTING_FIELD_NAME = "name";
+
+    static final String ACCOUNTS_LISTING_FIELD_ACCESS_TOKEN = "access_token";
+
+    static final String ACCOUNTS_LISTING_FIELD_PERMS = "perms";
+
+    /**
+     * The content creation account permission.
+     */
+    static final String ACCOUNT_PERM_CREATE_CONTENT = "CREATE_CONTENT";
+
+    /**
+     * The {@link String} to append to Page id to create graph path.
+     */
+    static final String PAGE_ID_TO_GRAPH_PATH = "/photos";
 
     //
     // Albums listing params.
@@ -177,6 +226,11 @@ public class FacebookEndpoint extends WingsEndpoint {
     static final String APP_ALBUM_GRAPH_PATH = "me/photos";
 
     /**
+     * The privacy level of the Page album.
+     */
+    static final String PAGE_PRIVACY = "page";
+
+    /**
      * The configurable privacy level of the app album.
      */
     static final String APP_ALBUM_PRIVACY = "select privacy level";
@@ -216,6 +270,8 @@ public class FacebookEndpoint extends WingsEndpoint {
 
     private static final String SHARE_KEY_PICTURE = "picture";
 
+    private static final String SHARE_KEY_PAGE_ACCESS_TOKEN = "access_token";
+
     private static final String SHARE_KEY_PHOTO_PRIVACY = "privacy";
 
     private static final String SHARE_KEY_PHOTO_ID = "id";
@@ -250,6 +306,7 @@ public class FacebookEndpoint extends WingsEndpoint {
         List<String> readPermissions = new LinkedList<String>();
         readPermissions.add(PERMISSION_PUBLIC_PROFILE);
         readPermissions.add(PERMISSION_USER_PHOTOS);
+        readPermissions.add(PERMISSION_MANAGE_PAGES);
 
         // Construct open request.
         OpenRequest openRequest;
@@ -423,20 +480,15 @@ public class FacebookEndpoint extends WingsEndpoint {
     /**
      * Links an account.
      *
-     * @param accountName    the user name associated with the account.
-     * @param photoPrivacy   the privacy level of shared photos. Only used for albums with 'custom' privacy level. May be null.
-     * @param albumName      the name of the album to share to.
-     * @param albumGraphPath the graph path of the album to share to.
+     * @param settings the {@link com.groundupworks.wings.facebook.FacebookSettings}.
      * @return true if successful; false otherwise.
      */
-    private boolean link(String accountName, String photoPrivacy, String albumName,
-                         String albumGraphPath) {
+    private boolean link(FacebookSettings settings) {
         boolean isSuccessful = false;
 
         // Validate account params and store.
-        if (accountName != null && accountName.length() > 0 && albumName != null && albumName.length() > 0
-                && albumGraphPath != null && albumGraphPath.length() > 0) {
-            storeAccountParams(accountName, photoPrivacy, albumName, albumGraphPath);
+        if (settings != null) {
+            storeSettings(settings);
 
             // Emit link state change event.
             notifyLinkStateChanged(new LinkEvent(true));
@@ -479,22 +531,29 @@ public class FacebookEndpoint extends WingsEndpoint {
     }
 
     /**
-     * Stores the account params in persisted storage.
+     * Stores the link settings in persisted storage.
      *
-     * @param accountName    the user name associated with the account.
-     * @param photoPrivacy   the privacy level of shared photos. Only used for albums with 'custom' privacy level. May be null.
-     * @param albumName      the name of the album to share to.
-     * @param albumGraphPath the graph path of the album to share to.
+     * @param settings the {@link com.groundupworks.wings.facebook.FacebookSettings}.
      */
-    private void storeAccountParams(String accountName, String photoPrivacy, String albumName,
-                                    String albumGraphPath) {
+    private void storeSettings(FacebookSettings settings) {
+        int destinationId = settings.getDestinationId();
+        String accountName = settings.getAccountName();
+        String albumName = settings.getAlbumName();
+        String albumGraphPath = settings.getAlbumGraphPath();
+        String pageAccessToken = settings.optPageAccessToken();
+        String photoPrivacy = settings.optPhotoPrivacy();
+
         Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        editor.putInt(mContext.getString(R.string.wings_facebook__destination_id_key), destinationId);
         editor.putString(mContext.getString(R.string.wings_facebook__account_name_key), accountName);
-        if (photoPrivacy != null && photoPrivacy.length() > 0) {
-            editor.putString(mContext.getString(R.string.wings_facebook__photo_privacy_key), photoPrivacy);
-        }
         editor.putString(mContext.getString(R.string.wings_facebook__album_name_key), albumName);
         editor.putString(mContext.getString(R.string.wings_facebook__album_graph_path_key), albumGraphPath);
+        if (!TextUtils.isEmpty(pageAccessToken)) {
+            editor.putString(mContext.getString(R.string.wings_facebook__page_access_token_key), pageAccessToken);
+        }
+        if (!TextUtils.isEmpty(photoPrivacy)) {
+            editor.putString(mContext.getString(R.string.wings_facebook__photo_privacy_key), photoPrivacy);
+        }
 
         // Set preference to linked.
         editor.putBoolean(mContext.getString(R.string.wings_facebook__link_key), true);
@@ -502,38 +561,41 @@ public class FacebookEndpoint extends WingsEndpoint {
     }
 
     /**
-     * Removes the account params from persisted storage.
+     * Fetches the link settings from persisted storage.
+     *
+     * @return the {@link com.groundupworks.wings.facebook.FacebookSettings}; or null if unlinked.
      */
-    private void removeAccountParams() {
+    private FacebookSettings fetchSettings() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+        if (!preferences.getBoolean(mContext.getString(R.string.wings_facebook__link_key), false)) {
+            return null;
+        }
+
+        int destinationId = preferences.getInt(mContext.getString(R.string.wings_facebook__destination_id_key), DestinationId.UNLINKED);
+        String accountName = preferences.getString(mContext.getString(R.string.wings_facebook__account_name_key), null);
+        String albumName = preferences.getString(mContext.getString(R.string.wings_facebook__album_name_key), null);
+        String albumGraphPath = preferences.getString(mContext.getString(R.string.wings_facebook__album_graph_path_key), null);
+        String pageAccessToken = preferences.getString(mContext.getString(R.string.wings_facebook__page_access_token_key), null);
+        String photoPrivacy = preferences.getString(mContext.getString(R.string.wings_facebook__photo_privacy_key), null);
+
+        return FacebookSettings.newInstance(destinationId, accountName, albumName, albumGraphPath, pageAccessToken, photoPrivacy);
+    }
+
+    /**
+     * Removes the link settings from persisted storage.
+     */
+    private void removeSettings() {
         Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        editor.remove(mContext.getString(R.string.wings_facebook__destination_id_key));
         editor.remove(mContext.getString(R.string.wings_facebook__account_name_key));
-        editor.remove(mContext.getString(R.string.wings_facebook__photo_privacy_key));
         editor.remove(mContext.getString(R.string.wings_facebook__album_name_key));
         editor.remove(mContext.getString(R.string.wings_facebook__album_graph_path_key));
+        editor.remove(mContext.getString(R.string.wings_facebook__page_access_token_key));
+        editor.remove(mContext.getString(R.string.wings_facebook__photo_privacy_key));
 
         // Set preference to unlinked.
         editor.putBoolean(mContext.getString(R.string.wings_facebook__link_key), false);
         editor.apply();
-    }
-
-    /**
-     * Gets the privacy level of shared photos.
-     *
-     * @return the privacy level; or null if unlinked.
-     */
-    private String optLinkedPhotoPrivacy() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.wings_facebook__photo_privacy_key), null);
-    }
-
-    /**
-     * Gets the graph path of the album to share to.
-     *
-     * @return the graph path; or null if unlinked.
-     */
-    private String getLinkedAlbumGraphPath() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.wings_facebook__album_graph_path_key), null);
     }
 
     /**
@@ -554,16 +616,6 @@ public class FacebookEndpoint extends WingsEndpoint {
         return photoId;
     }
 
-    /**
-     * Gets the name of the album to share to.
-     *
-     * @return the album name; or null if unlinked.
-     */
-    private String getLinkedAlbumName() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.wings_facebook__album_name_key), null);
-    }
-
     //
     // Package private methods.
     //
@@ -580,7 +632,31 @@ public class FacebookEndpoint extends WingsEndpoint {
 
         Session session = Session.getActiveSession();
         if (session != null && session.isOpened()) {
-            Request.executeMeRequestAsync(session, graphUserCallback);
+            Request.newMeRequest(session, graphUserCallback).executeAsync();
+            isSuccessful = true;
+        }
+        return isSuccessful;
+    }
+
+    /**
+     * Asynchronously requests the Page accounts associated with the linked account. Requires an opened active {@link Session}.
+     *
+     * @param callback a {@link Callback} when the request completes.
+     * @return true if the request is made; false if no opened {@link Session} is active.
+     */
+    boolean requestAccounts(Callback callback) {
+        boolean isSuccessful = false;
+
+        Session session = Session.getActiveSession();
+        if (session != null && session.isOpened()) {
+            // Construct fields to request.
+            Bundle params = new Bundle();
+            params.putString(ACCOUNTS_LISTING_FEILDS_KEY, ACCOUNTS_LISTING_FIELDS_VALUE);
+
+            // Construct and execute albums listing request.
+            Request request = new Request(session, ACCOUNTS_LISTING_GRAPH_PATH, params, HttpMethod.GET, callback);
+            request.executeAsync();
+
             isSuccessful = true;
         }
         return isSuccessful;
@@ -642,7 +718,7 @@ public class FacebookEndpoint extends WingsEndpoint {
     @Override
     public void unlink() {
         // Unlink in persisted storage.
-        removeAccountParams();
+        removeSettings();
 
         // Unlink any current session.
         Session session = Session.getActiveSession();
@@ -659,6 +735,7 @@ public class FacebookEndpoint extends WingsEndpoint {
             @Override
             public void run() {
                 mDatabase.deleteShareRequests(new Destination(DestinationId.PROFILE, ENDPOINT_ID));
+                mDatabase.deleteShareRequests(new Destination(DestinationId.PAGE, ENDPOINT_ID));
             }
         });
     }
@@ -698,19 +775,15 @@ public class FacebookEndpoint extends WingsEndpoint {
                 break;
             }
             case STATE_SETTINGS_REQUEST: {
+                // Link account.
                 FacebookSettings settings = finishSettingsRequest(requestCode, resultCode, data);
-                if (settings != null) {
-                    // Link account.
-                    if (link(settings.getAccountName(), settings.optPhotoPrivacy(), settings.getAlbumName(), settings.getAlbumGraphPath())) {
-                        // End link request, but persist link tokens.
-                        Session session = Session.getActiveSession();
-                        if (session != null && !session.isClosed()) {
-                            session.close();
-                        }
-                        mLinkRequestState = STATE_NONE;
-                    } else {
-                        handleLinkError();
+                if (link(settings)) {
+                    // End link request, but persist link tokens.
+                    Session session = Session.getActiveSession();
+                    if (session != null && !session.isClosed()) {
+                        session.close();
                     }
+                    mLinkRequestState = STATE_NONE;
                 } else {
                     handleLinkError();
                 }
@@ -723,12 +796,18 @@ public class FacebookEndpoint extends WingsEndpoint {
 
     @Override
     public LinkInfo getLinkInfo() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String accountName = preferences.getString(mContext.getString(R.string.wings_facebook__account_name_key), null);
-        String albumName = getLinkedAlbumName();
-        if (accountName != null && accountName.length() > 0 && albumName != null && albumName.length() > 0) {
-            String destinationDescription = mContext.getString(R.string.wings_facebook__destination_description, accountName, albumName);
-            return new LinkInfo(accountName, DestinationId.PROFILE, destinationDescription);
+        FacebookSettings settings = fetchSettings();
+        if (settings != null) {
+            int destinationId = settings.getDestinationId();
+            String accountName = settings.getAccountName();
+
+            int resId = R.string.wings_facebook__destination_profile_description;
+            if (DestinationId.PAGE == destinationId) {
+                resId = R.string.wings_facebook__destination_page_description;
+            }
+            String destinationDescription = mContext.getString(resId, accountName, settings.getAlbumName());
+
+            return new LinkInfo(accountName, destinationId, destinationDescription);
         }
         return null;
     }
@@ -738,12 +817,11 @@ public class FacebookEndpoint extends WingsEndpoint {
         Set<IWingsNotification> notifications = new HashSet<IWingsNotification>();
 
         // Get params associated with the linked account.
-        String photoPrivacy = optLinkedPhotoPrivacy();
-        String albumName = getLinkedAlbumName();
-        String albumGraphPath = getLinkedAlbumGraphPath();
-        if (albumName != null && albumGraphPath != null) {
+        FacebookSettings settings = fetchSettings();
+        if (settings != null) {
             // Get share requests for Facebook.
-            Destination destination = new Destination(DestinationId.PROFILE, ENDPOINT_ID);
+            int destinationId = settings.getDestinationId();
+            Destination destination = new Destination(destinationId, ENDPOINT_ID);
             List<ShareRequest> shareRequests = mDatabase.checkoutShareRequests(destination);
             int shared = 0;
             String intentUri = null;
@@ -761,12 +839,19 @@ public class FacebookEndpoint extends WingsEndpoint {
                             fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
                             Bundle params = new Bundle();
                             params.putParcelable(SHARE_KEY_PICTURE, fileDescriptor);
-                            if (photoPrivacy != null && photoPrivacy.length() > 0) {
+
+                            String pageAccessToken = settings.optPageAccessToken();
+                            if (DestinationId.PAGE == destinationId && !TextUtils.isEmpty(pageAccessToken)) {
+                                params.putString(SHARE_KEY_PAGE_ACCESS_TOKEN, pageAccessToken);
+                            }
+
+                            String photoPrivacy = settings.optPhotoPrivacy();
+                            if (!TextUtils.isEmpty(photoPrivacy)) {
                                 params.putString(SHARE_KEY_PHOTO_PRIVACY, photoPrivacy);
                             }
 
                             // Execute upload request synchronously. Need to use RequestBatch to set connection timeout.
-                            Request request = new Request(session, albumGraphPath, params, HttpMethod.POST, null);
+                            Request request = new Request(session, settings.getAlbumGraphPath(), params, HttpMethod.POST, null);
                             RequestBatch requestBatch = new RequestBatch(request);
                             requestBatch.setTimeout(HTTP_REQUEST_TIMEOUT);
                             List<Response> responses = requestBatch.executeAndWait();
@@ -833,7 +918,7 @@ public class FacebookEndpoint extends WingsEndpoint {
 
             // Construct and add notification representing share results.
             if (shared > 0) {
-                notifications.add(new FacebookNotification(mContext, destination.getHash(), albumName, shared, intentUri));
+                notifications.add(new FacebookNotification(mContext, destination.getHash(), settings.getAlbumName(), shared, intentUri));
             }
         }
 
@@ -859,6 +944,11 @@ public class FacebookEndpoint extends WingsEndpoint {
          * The personal Facebook profile.
          */
         public static final int PROFILE = 0;
+
+        /**
+         * A Facebook Page.
+         */
+        public static final int PAGE = 1;
     }
 
     /**

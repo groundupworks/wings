@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="wings_facebook__link_key">wings_facebook__link_key</string>
+    <string name="wings_facebook__destination_id_key">wings_facebook__destination_id_key</string>
     <string name="wings_facebook__account_name_key">wings_facebook__account_name_key</string>
-    <string name="wings_facebook__photo_privacy_key">wings_facebook__photo_privacy_key</string>
     <string name="wings_facebook__album_name_key">wings_facebook__album_name_key</string>
     <string name="wings_facebook__album_graph_path_key">wings_facebook__album_graph_path_key</string>
+    <string name="wings_facebook__page_access_token_key">wings_facebook__page_access_token_key</string>
+    <string name="wings_facebook__photo_privacy_key">wings_facebook__photo_privacy_key</string>
 </resources>
