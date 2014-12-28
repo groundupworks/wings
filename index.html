@@ -144,9 +144,9 @@ public void handleLinkEvent(DropboxEndpoint.LinkEvent event) {
 
 <p>After confirming that a <code>WingsEndpoint#isLinked()</code>, you want to start sharing photos to that endpoint. This is done by calling <code>Wings#share()</code>, which internally creates a share request record in a database and triggers a background service to process that request. If the device has no connectivity at the moment, a retry will be scheduled according to a retry policy that waits longer and longer between subsequent retries should the request keep failing. The current implementation calculates retry intervals based on the Fibonacci sequence and gives up on records that has failed for more than two days.</p>
 
-<p>The following call will create a share request to post a photo to the user's Facebook profile. A notification will appear on the status bar once the photo has been shared.</p>
+<p>The following call will create a share request to post a photo to the user's linked Facebook destination. That destination may be a Facebook Album associated with the user's Profile or a Page that the user has permission to publish content to. A notification will appear on the status bar once the photo has been shared.</p>
 
-<pre><code>Wings.share(filePath, FacebookEndpoint.DestinationId.PROFILE, FacebookEndpoint.class);
+<pre><code>Wings.share(filePath, FacebookEndpoint.class);
 </code></pre>
 
 <h2>
