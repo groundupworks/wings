@@ -306,7 +306,6 @@ public class FacebookEndpoint extends WingsEndpoint {
         List<String> readPermissions = new LinkedList<String>();
         readPermissions.add(PERMISSION_PUBLIC_PROFILE);
         readPermissions.add(PERMISSION_USER_PHOTOS);
-        readPermissions.add(PERMISSION_MANAGE_PAGES);
 
         // Construct open request.
         OpenRequest openRequest;
@@ -370,6 +369,7 @@ public class FacebookEndpoint extends WingsEndpoint {
             // Construct publish permissions.
             List<String> publishPermissions = new LinkedList<String>();
             publishPermissions.add(PERMISSION_PUBLISH_ACTIONS);
+            publishPermissions.add(PERMISSION_MANAGE_PAGES);
 
             // Construct permissions request to publish publicly.
             NewPermissionsRequest permissionsRequest;
