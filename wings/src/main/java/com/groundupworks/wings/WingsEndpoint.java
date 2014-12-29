@@ -130,19 +130,11 @@ public abstract class WingsEndpoint {
     public abstract void onActivityResultImpl(Activity activity, Fragment fragment, int requestCode, int resultCode, Intent data);
 
     /**
-     * Gets the user name associated with the linked account.
+     * Gets the information associated with the link.
      *
-     * @return the user name; or null if unlinked.
+     * @return the {@link com.groundupworks.wings.WingsEndpoint.LinkInfo}; or null if unlinked.
      */
-    public abstract String getLinkedAccountName();
-
-    /**
-     * Gets the description associated with the destination.
-     *
-     * @param destinationId the destination id.
-     * @return the destination description; or null if unlinked.
-     */
-    public abstract String getDestinationDescription(int destinationId);
+    public abstract LinkInfo getLinkInfo();
 
     /**
      * Process share requests by sharing to the linked account. This should be called in a background
@@ -164,4 +156,49 @@ public abstract class WingsEndpoint {
      * the specific endpoint.
      */
     public abstract <T extends WingsLinkEvent> T produceLinkEvent();
+
+    /**
+     * The base interface for destination id.
+     */
+    public interface DestinationId {
+
+        /**
+         * The destination id when unlinked.
+         */
+        public static final int UNLINKED = Integer.MIN_VALUE;
+    }
+
+    /**
+     * Information associated with the link.
+     */
+    public static class LinkInfo {
+
+        /**
+         * The user name.
+         */
+        public final String mUserName;
+
+        /**
+         * The destination id.
+         */
+        public final int mDestinationId;
+
+        /**
+         * The destination description.
+         */
+        public final String mDestinationDescription;
+
+        /**
+         * Constructor.
+         *
+         * @param userName               the user name.
+         * @param destinationId          the destination id.
+         * @param destinationDescription the destination description.
+         */
+        public LinkInfo(String userName, int destinationId, String destinationDescription) {
+            mUserName = userName;
+            mDestinationId = destinationId;
+            mDestinationDescription = destinationDescription;
+        }
+    }
 }

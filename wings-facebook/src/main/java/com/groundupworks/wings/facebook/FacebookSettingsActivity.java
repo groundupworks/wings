@@ -23,6 +23,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
+
+import com.groundupworks.wings.WingsEndpoint;
 
 /**
  * {@link Activity} to configure how a Facebook account is linked.
@@ -40,13 +43,17 @@ public class FacebookSettingsActivity extends FragmentActivity {
     // Required Facebook settings.
     //
 
-    String mAccountName = null;
+    int mDestinationId = FacebookEndpoint.DestinationId.UNLINKED;
 
-    String mPhotoPrivacy = null;
+    String mAccountName = null;
 
     String mAlbumName = null;
 
     String mAlbumGraphPath = null;
+
+    String mPageAccessToken = null;
+
+    String mPhotoPrivacy = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,9 +108,10 @@ public class FacebookSettingsActivity extends FragmentActivity {
         }
 
         // Return the results if all settings are filled.
-        if (mAccountName != null && mAlbumName != null && mAlbumGraphPath != null) {
-            FacebookSettings settings = FacebookSettings.newInstance(mAccountName, mPhotoPrivacy, mAlbumName,
-                    mAlbumGraphPath);
+        if (mDestinationId != FacebookEndpoint.DestinationId.UNLINKED && mAccountName != null &&
+                mAlbumName != null && mAlbumGraphPath != null) {
+            FacebookSettings settings = FacebookSettings.newInstance(mDestinationId, mAccountName,
+                    mAlbumName, mAlbumGraphPath, mPageAccessToken, mPhotoPrivacy);
             if (settings != null) {
                 Intent result = new Intent();
                 result.putExtras(settings.toBundle());

@@ -3,7 +3,8 @@
     <!-- Facebook Endpoint -->
     <string name="wings_facebook__error_link">Unable to link Facebook</string>
     <string name="wings_facebook__error_facebook_app">Facebook app must be installed</string>
-    <string name="wings_facebook__destination_description">%1$s\'s Facebook album %2$s</string>
+    <string name="wings_facebook__destination_profile_description">%1$s\'s Facebook album %2$s</string>
+    <string name="wings_facebook__destination_page_description">%1$s\'s Facebook Page %2$s</string>
     <string name="wings_facebook__notification_shared_title">Facebook share</string>
     <string name="wings_facebook__notification_shared_msg_single">+1 photo to %1$s</string>
     <string name="wings_facebook__notification_shared_msg_multi">+%1$d photos to %2$s</string>

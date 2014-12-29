@@ -32,9 +32,9 @@ import com.dropbox.client2.exception.DropboxServerException;
 import com.dropbox.client2.exception.DropboxUnlinkedException;
 import com.dropbox.client2.session.AppKeyPair;
 import com.groundupworks.wings.IWingsNotification;
-import com.groundupworks.wings.WingsDestination;
 import com.groundupworks.wings.WingsEndpoint;
 import com.groundupworks.wings.WingsLinkEvent;
+import com.groundupworks.wings.core.Destination;
 import com.groundupworks.wings.core.ShareRequest;
 import com.squareup.otto.Produce;
 
@@ -338,7 +338,7 @@ public class DropboxEndpoint extends WingsEndpoint {
 
             @Override
             public void run() {
-                mDatabase.deleteShareRequests(new WingsDestination(DestinationId.APP_FOLDER, ENDPOINT_ID));
+                mDatabase.deleteShareRequests(new Destination(DestinationId.APP_FOLDER, ENDPOINT_ID));
             }
         });
     }
@@ -367,20 +367,15 @@ public class DropboxEndpoint extends WingsEndpoint {
     }
 
     @Override
-    public String getLinkedAccountName() {
+    public LinkInfo getLinkInfo() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.wings_dropbox__account_name_key), null);
-    }
-
-    @Override
-    public String getDestinationDescription(int destinationId) {
-        String destinationDescription = null;
-        String accountName = getLinkedAccountName();
+        String accountName = preferences.getString(mContext.getString(R.string.wings_dropbox__account_name_key), null);
         String shareUrl = getLinkedShareUrl();
         if (accountName != null && accountName.length() > 0 && shareUrl != null && shareUrl.length() > 0) {
-            destinationDescription = mContext.getString(R.string.wings_dropbox__destination_description, accountName, shareUrl);
+            String destinationDescription = mContext.getString(R.string.wings_dropbox__destination_description, accountName, shareUrl);
+            return new LinkInfo(accountName, DestinationId.APP_FOLDER, destinationDescription);
         }
-        return destinationDescription;
+        return null;
     }
 
     @Override
@@ -392,7 +387,7 @@ public class DropboxEndpoint extends WingsEndpoint {
         String shareUrl = getLinkedShareUrl();
         if (accessToken != null && shareUrl != null) {
             // Get share requests for Dropbox.
-            WingsDestination destination = new WingsDestination(DestinationId.APP_FOLDER, ENDPOINT_ID);
+            Destination destination = new Destination(DestinationId.APP_FOLDER, ENDPOINT_ID);
             List<ShareRequest> shareRequests = mDatabase.checkoutShareRequests(destination);
             int shared = 0;
 
@@ -467,7 +462,7 @@ public class DropboxEndpoint extends WingsEndpoint {
     /**
      * The list of destination ids.
      */
-    public interface DestinationId {
+    public interface DestinationId extends WingsEndpoint.DestinationId {
 
         /**
          * The Dropbox app folder.

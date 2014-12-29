@@ -51,19 +51,27 @@ public class FacebookAlbumListFragment extends ListFragment {
 
     private static final String CURSOR_ID = "_id";
 
+    private static final String CURSOR_DESTINATION_ID = "destinationId";
+
     private static final String CURSOR_ALBUM_NAME = "name";
 
     private static final String CURSOR_ALBUM_GRAPH_PATH = "graphPath";
 
     private static final String CURSOR_ALBUM_PRIVACY = "privacy";
 
+    private static final String CURSOR_PAGE_ACCESS_TOKEN = "pageAccessToken";
+
     private static final int CURSOR_ID_INDEX = 0;
 
-    private static final int CURSOR_ALBUM_NAME_INDEX = 1;
+    private static final int CURSOR_DESTINATION_ID_INDEX = 1;
 
-    private static final int CURSOR_ALBUM_GRAPH_PATH_INDEX = 2;
+    private static final int CURSOR_ALBUM_NAME_INDEX = 2;
 
-    private static final int CURSOR_ALBUM_PRIVACY_INDEX = 3;
+    private static final int CURSOR_ALBUM_GRAPH_PATH_INDEX = 3;
+
+    private static final int CURSOR_ALBUM_PRIVACY_INDEX = 4;
+
+    private static final int CURSOR_PAGE_ACCESS_TOKEN_INDEX = 5;
 
     /**
      * The cursor id of the app album to share to.
@@ -78,15 +86,15 @@ public class FacebookAlbumListFragment extends ListFragment {
     /**
      * Cursor to back the albums list.
      */
-    private MatrixCursor mAlbumCursor = new MatrixCursor(new String[]{CURSOR_ID, CURSOR_ALBUM_NAME,
-            CURSOR_ALBUM_GRAPH_PATH, CURSOR_ALBUM_PRIVACY});
+    private MatrixCursor mAlbumCursor = new MatrixCursor(new String[]{CURSOR_ID, CURSOR_DESTINATION_ID,
+            CURSOR_ALBUM_NAME, CURSOR_ALBUM_GRAPH_PATH, CURSOR_ALBUM_PRIVACY, CURSOR_PAGE_ACCESS_TOKEN});
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Make async requests for account information.
-        requestAlbums();
+        requestAccounts();
         requestAccountName();
     }
 
@@ -102,17 +110,19 @@ public class FacebookAlbumListFragment extends ListFragment {
             do {
                 long cursorId = mAlbumCursor.getLong(CURSOR_ID_INDEX);
                 if (cursorId == id) {
-                    String albumPrivacy = mAlbumCursor.getString(CURSOR_ALBUM_PRIVACY_INDEX);
+                    int destinationId = mAlbumCursor.getInt(CURSOR_DESTINATION_ID_INDEX);
                     String albumName = mAlbumCursor.getString(CURSOR_ALBUM_NAME_INDEX);
                     String albumGraphPath = mAlbumCursor.getString(CURSOR_ALBUM_GRAPH_PATH_INDEX);
+                    String albumPrivacy = mAlbumCursor.getString(CURSOR_ALBUM_PRIVACY_INDEX);
                     if (FacebookEndpoint.APP_ALBUM_PRIVACY.equals(albumPrivacy)) {
-                        // Request for photo privacy.
-                        activity.showDialogFragment(FacebookPrivacyDialogFragment
-                                .newInstance(albumName, albumGraphPath));
+                        // Request for app album photo privacy.
+                        activity.showDialogFragment(FacebookPrivacyDialogFragment.newInstance(albumName, albumGraphPath));
                     } else {
                         // Finish Activity without photo privacy.
+                        activity.mDestinationId = destinationId;
                         activity.mAlbumName = albumName;
                         activity.mAlbumGraphPath = albumGraphPath;
+                        activity.mPageAccessToken = mAlbumCursor.getString(CURSOR_PAGE_ACCESS_TOKEN_INDEX);
                         activity.tryFinish();
                     }
                     break;
@@ -157,10 +167,79 @@ public class FacebookAlbumListFragment extends ListFragment {
     }
 
     /**
+     * Asynchronously requests the Page accounts associated with the linked account. Calls
+     * {@link #requestAlbums(java.util.List)} when completed.
+     */
+    private void requestAccounts() {
+        Callback callback = new Callback() {
+            @Override
+            public void onCompleted(Response response) {
+                FacebookSettingsActivity activity = (FacebookSettingsActivity) getActivity();
+                if (activity == null || activity.isFinishing()) {
+                    return;
+                }
+
+                if (response != null && response.getError() == null) {
+                    List<Object[]> pageAlbums = new ArrayList<Object[]>();
+
+                    GraphObject graphObject = response.getGraphObject();
+                    if (graphObject != null) {
+                        JSONObject jsonObject = graphObject.getInnerJSONObject();
+                        try {
+                            JSONArray jsonArray = jsonObject
+                                    .getJSONArray(FacebookEndpoint.ACCOUNTS_LISTING_RESULT_DATA_KEY);
+                            long cursorId = 1L;
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                try {
+                                    // Get data from json.
+                                    JSONObject album = jsonArray.getJSONObject(i);
+                                    String id = album.getString(FacebookEndpoint.ACCOUNTS_LISTING_FIELD_ID);
+                                    String name = album.getString(FacebookEndpoint.ACCOUNTS_LISTING_FIELD_NAME);
+                                    String pageAccessToken = album.getString(FacebookEndpoint.ACCOUNTS_LISTING_FIELD_ACCESS_TOKEN);
+                                    JSONArray perms = album.getJSONArray(FacebookEndpoint.ACCOUNTS_LISTING_FIELD_PERMS);
+
+                                    // Add Page albums with content creation permission.
+                                    for (int j = 0; j < perms.length(); j++) {
+                                        if (FacebookEndpoint.ACCOUNT_PERM_CREATE_CONTENT.equals(perms.optString(j))) {
+                                            if (id != null && id.length() > 0 && name != null && name.length() > 0
+                                                    && pageAccessToken != null && pageAccessToken.length() > 0) {
+                                                String graphPath = id + FacebookEndpoint.PAGE_ID_TO_GRAPH_PATH;
+                                                pageAlbums.add(new Object[]{cursorId, FacebookEndpoint.DestinationId.PAGE,
+                                                        name, graphPath, FacebookEndpoint.PAGE_PRIVACY, pageAccessToken});
+                                                cursorId++;
+                                            }
+                                            break;
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    // Do nothing.
+                                }
+                            }
+                        } catch (JSONException e) {
+                            // Do nothing.
+                        }
+                    }
+
+                    // Request for albums.
+                    requestAlbums(pageAlbums);
+                } else {
+                    // Finish Activity with error.
+                    activity.mHasErrorOccurred = true;
+                    activity.tryFinish();
+                }
+            }
+        };
+
+        mFacebookEndpoint.requestAccounts(callback);
+    }
+
+    /**
      * Asynchronously requests the albums associated with the linked account. Sets the {@link ListAdapter} when
      * completed.
+     *
+     * @param pageAlbums a list of page albums associated with Page accounts.
      */
-    private void requestAlbums() {
+    private void requestAlbums(final List<Object[]> pageAlbums) {
         Callback callback = new Callback() {
             @Override
             public void onCompleted(Response response) {
@@ -179,7 +258,7 @@ public class FacebookAlbumListFragment extends ListFragment {
                         try {
                             JSONArray jsonArray = jsonObject
                                     .getJSONArray(FacebookEndpoint.ALBUMS_LISTING_RESULT_DATA_KEY);
-                            long cursorId = 1L;
+                            long cursorId = 1L + pageAlbums.size();
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 try {
                                     // Get data from json.
@@ -197,10 +276,11 @@ public class FacebookAlbumListFragment extends ListFragment {
                                             && privacy.length() > 0) {
                                         String graphPath = id + FacebookEndpoint.ALBUM_ID_TO_GRAPH_PATH;
                                         if (FacebookEndpoint.DEFAULT_ALBUM_TYPE.equals(type)) {
-                                            appAlbum = new Object[]{APP_ALBUM_CURSOR_ID, name, graphPath,
-                                                    FacebookEndpoint.APP_ALBUM_PRIVACY};
+                                            appAlbum = new Object[]{APP_ALBUM_CURSOR_ID, FacebookEndpoint.DestinationId.PROFILE,
+                                                    name, graphPath, FacebookEndpoint.APP_ALBUM_PRIVACY, null};
                                         } else {
-                                            albums.add(new Object[]{cursorId, name, graphPath, privacy});
+                                            albums.add(new Object[]{cursorId, FacebookEndpoint.DestinationId.PROFILE,
+                                                    name, graphPath, privacy, null});
                                             cursorId++;
                                         }
                                     }
@@ -223,6 +303,9 @@ public class FacebookAlbumListFragment extends ListFragment {
 
                     // Construct matrix cursor.
                     mAlbumCursor.addRow(appAlbum);
+                    for (Object[] pageAlbum : pageAlbums) {
+                        mAlbumCursor.addRow(pageAlbum);
+                    }
                     for (Object[] album : albums) {
                         mAlbumCursor.addRow(album);
                     }

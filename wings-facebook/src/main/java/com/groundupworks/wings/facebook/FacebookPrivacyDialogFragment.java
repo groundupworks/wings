@@ -97,6 +97,7 @@ public class FacebookPrivacyDialogFragment extends DialogFragment {
             // Set Facebook settings.
             if (photoPrivacy != null && photoPrivacy.length() > 0 && albumName != null && albumName.length() > 0
                     && albumGraphPath != null && albumGraphPath.length() > 0) {
+                activity.mDestinationId = FacebookEndpoint.DestinationId.PROFILE;
                 activity.mPhotoPrivacy = photoPrivacy;
                 activity.mAlbumName = albumName;
                 activity.mAlbumGraphPath = albumGraphPath;
@@ -104,7 +105,7 @@ public class FacebookPrivacyDialogFragment extends DialogFragment {
                 activity.mHasErrorOccurred = true;
             }
 
-            // Finish activity with
+            // Finish activity.
             activity.tryFinish();
         }
     }

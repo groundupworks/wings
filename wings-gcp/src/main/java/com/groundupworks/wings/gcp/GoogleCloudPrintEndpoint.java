@@ -25,9 +25,9 @@ import android.widget.Toast;
 
 import com.github.dpsm.android.print.GoogleCloudPrint;
 import com.groundupworks.wings.IWingsNotification;
-import com.groundupworks.wings.WingsDestination;
 import com.groundupworks.wings.WingsEndpoint;
 import com.groundupworks.wings.WingsLinkEvent;
+import com.groundupworks.wings.core.Destination;
 import com.groundupworks.wings.core.ShareRequest;
 import com.squareup.otto.Produce;
 
@@ -123,7 +123,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
 
             @Override
             public void run() {
-                mDatabase.deleteShareRequests(new WingsDestination(DestinationId.PRINT_QUEUE, ENDPOINT_ID));
+                mDatabase.deleteShareRequests(new Destination(DestinationId.PRINT_QUEUE, ENDPOINT_ID));
             }
         });
     }
@@ -172,21 +172,15 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
     }
 
     @Override
-    public String getLinkedAccountName() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        return preferences.getString(mContext.getString(R.string.wings_gcp__account_name_key), null);
-    }
-
-    @Override
-    public String getDestinationDescription(final int destinationId) {
-        String destinationDescription = null;
+    public LinkInfo getLinkInfo() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         String accountName = preferences.getString(mContext.getString(R.string.wings_gcp__account_name_key), null);
         String printerIdentifier = preferences.getString(mContext.getString(R.string.wings_gcp__printer_identifier_key), null);
         if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier)) {
-            destinationDescription = mContext.getString(R.string.wings_gcp__destination_description, accountName, printerIdentifier);
+            String destinationDescription = mContext.getString(R.string.wings_gcp__destination_description, accountName, printerIdentifier);
+            return new LinkInfo(accountName, DestinationId.PRINT_QUEUE, destinationDescription);
         }
-        return destinationDescription;
+        return null;
     }
 
     @Override
@@ -203,7 +197,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         if (isLinked && !TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier) &&
                 !TextUtils.isEmpty(token)) {
             final String ticket = !TextUtils.isEmpty(media) ? String.format(TICKET_WITH_MEDIA, media) : TICKET;
-            final WingsDestination destination = new WingsDestination(DestinationId.PRINT_QUEUE, ENDPOINT_ID);
+            final Destination destination = new Destination(DestinationId.PRINT_QUEUE, ENDPOINT_ID);
             List<ShareRequest> shareRequests = mDatabase.checkoutShareRequests(destination);
             for (ShareRequest shareRequest : shareRequests) {
                 File file = new File(shareRequest.getFilePath());
@@ -282,7 +276,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
     /**
      * The list of destination ids.
      */
-    public interface DestinationId {
+    public interface DestinationId extends WingsEndpoint.DestinationId {
 
         /**
          * The GCP print queue.
