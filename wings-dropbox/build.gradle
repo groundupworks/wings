@@ -5,7 +5,6 @@ android {
     compileSdkVersion 21
 
     defaultConfig {
-        applicationId "com.groundupworks.wings.dropbox"
         minSdkVersion 10
         targetSdkVersion 21
         versionCode 1

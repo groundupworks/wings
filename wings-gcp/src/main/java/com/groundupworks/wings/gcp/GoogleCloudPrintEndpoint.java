@@ -44,6 +44,7 @@ import retrofit.mime.TypedFile;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_ACCOUNT;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_MEDIA;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_PRINTER;
+import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_PRINTER_NAME;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_TOKEN;
 
 /**
@@ -146,6 +147,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
             if (resultCode == Activity.RESULT_OK) {
                 String accountName = data.getStringExtra(EXTRA_ACCOUNT);
                 String printerIdentifier = data.getStringExtra(EXTRA_PRINTER);
+                String printerName = data.getStringExtra(EXTRA_PRINTER_NAME);
                 String media = data.getStringExtra(EXTRA_MEDIA);
                 String token = data.getStringExtra(EXTRA_TOKEN);
 
@@ -154,6 +156,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                     editor.putBoolean(mContext.getString(R.string.wings_gcp__link_key), true);
                     editor.putString(mContext.getString(R.string.wings_gcp__account_name_key), accountName);
                     editor.putString(mContext.getString(R.string.wings_gcp__printer_identifier_key), printerIdentifier);
+                    editor.putString(mContext.getString(R.string.wings_gcp__printer_name_key), printerName);
                     editor.putString(mContext.getString(R.string.wings_gcp__media), media);
                     editor.putString(mContext.getString(R.string.wings_gcp__token), token);
                     editor.apply();
@@ -175,7 +178,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
     public LinkInfo getLinkInfo() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         String accountName = preferences.getString(mContext.getString(R.string.wings_gcp__account_name_key), null);
-        String printerIdentifier = preferences.getString(mContext.getString(R.string.wings_gcp__printer_identifier_key), null);
+        String printerIdentifier = preferences.getString(mContext.getString(R.string.wings_gcp__printer_name_key), null);
         if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier)) {
             String destinationDescription = mContext.getString(R.string.wings_gcp__destination_description, accountName, printerIdentifier);
             return new LinkInfo(accountName, DestinationId.PRINT_QUEUE, destinationDescription);
