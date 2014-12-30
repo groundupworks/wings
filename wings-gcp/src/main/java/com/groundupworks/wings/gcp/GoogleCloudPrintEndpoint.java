@@ -26,7 +26,6 @@ import android.widget.Toast;
 import com.github.dpsm.android.print.GoogleCloudPrint;
 import com.groundupworks.wings.IWingsNotification;
 import com.groundupworks.wings.WingsEndpoint;
-import com.groundupworks.wings.WingsLinkEvent;
 import com.groundupworks.wings.core.Destination;
 import com.groundupworks.wings.core.ShareRequest;
 import com.squareup.otto.Produce;
@@ -290,7 +289,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
     /**
      * The link event implementation associated with this endpoint.
      */
-    public class LinkEvent extends WingsLinkEvent {
+    public class LinkEvent extends WingsEndpoint.LinkEvent {
 
         /**
          * Private constructor.

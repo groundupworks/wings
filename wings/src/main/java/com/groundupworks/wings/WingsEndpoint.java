@@ -69,14 +69,14 @@ public abstract class WingsEndpoint {
 
     /**
      * Notifies subscribers that the link state has changed. Each endpoint implementation must call
-     * this method with its own {@link com.groundupworks.wings.WingsLinkEvent} subclass when the
+     * this method with its own {@link com.groundupworks.wings.WingsEndpoint.LinkEvent} subclass when the
      * link state has changed.
      *
-     * @param event the {@link com.groundupworks.wings.WingsLinkEvent} implementation associated with
+     * @param event the {@link com.groundupworks.wings.WingsEndpoint.LinkEvent} implementation associated with
      *              the specific endpoint.
-     * @param <T>   the type for the {@link com.groundupworks.wings.WingsLinkEvent} subclass.
+     * @param <T>   the type for the {@link com.groundupworks.wings.WingsEndpoint.LinkEvent} subclass.
      */
-    protected <T extends WingsLinkEvent> void notifyLinkStateChanged(T event) {
+    protected <T extends WingsEndpoint.LinkEvent> void notifyLinkStateChanged(T event) {
         mBus.post(event);
     }
 
@@ -146,16 +146,16 @@ public abstract class WingsEndpoint {
     public abstract Set<IWingsNotification> processShareRequests();
 
     /**
-     * Produces a {@link com.groundupworks.wings.WingsLinkEvent} subclass reflecting the current link
+     * Produces a {@link com.groundupworks.wings.WingsEndpoint.LinkEvent} subclass reflecting the current link
      * state of the endpoint. This event is emitted to a subscriber immediately after subscription.
      * <p/>
      * The implementation of this method must be annotated with {@link com.squareup.otto.Produce}.
      *
-     * @param <T> the type for the {@link com.groundupworks.wings.WingsLinkEvent} subclass.
-     * @return the {@link com.groundupworks.wings.WingsLinkEvent} implementation associated with
+     * @param <T> the type for the {@link com.groundupworks.wings.WingsEndpoint.LinkEvent} subclass.
+     * @return the {@link com.groundupworks.wings.WingsEndpoint.LinkEvent} implementation associated with
      * the specific endpoint.
      */
-    public abstract <T extends WingsLinkEvent> T produceLinkEvent();
+    public abstract <T extends WingsEndpoint.LinkEvent> T produceLinkEvent();
 
     /**
      * The base interface for destination id.
@@ -199,6 +199,54 @@ public abstract class WingsEndpoint {
             mUserName = userName;
             mDestinationId = destinationId;
             mDestinationDescription = destinationDescription;
+        }
+    }
+
+    /**
+     * The base class of an event emitted when the link state of an endpoint changes. The event is also
+     * emitted to a subscriber immediately after subscription.
+     *
+     * @author Benedict Lau
+     */
+    public static abstract class LinkEvent {
+
+        /**
+         * The endpoint associated with the link state change.
+         */
+        private Class mEndpointClazz;
+
+        /**
+         * The current link state.
+         */
+        private boolean mIsLinked;
+
+        /**
+         * Protected constructor that subclasses must call.
+         *
+         * @param endpointClazz the endpoint {@link java.lang.Class} associated with the link state change.
+         * @param isLinked      the current link state.
+         */
+        protected LinkEvent(Class<? extends WingsEndpoint> endpointClazz, boolean isLinked) {
+            mEndpointClazz = endpointClazz;
+            mIsLinked = isLinked;
+        }
+
+        /**
+         * Gets the endpoint associated with the link state change.
+         *
+         * @return the endpoint {@link java.lang.Class}.
+         */
+        public Class<? extends WingsEndpoint> getEndpoint() {
+            return mEndpointClazz;
+        }
+
+        /**
+         * Gets the current link state.
+         *
+         * @return true if current link state for this endpoint is linked; false otherwise.
+         */
+        public final boolean isLinked() {
+            return mIsLinked;
         }
     }
 }
