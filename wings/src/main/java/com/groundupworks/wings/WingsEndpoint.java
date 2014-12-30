@@ -140,10 +140,10 @@ public abstract class WingsEndpoint {
      * Process share requests by sharing to the linked account. This should be called in a background
      * thread.
      *
-     * @return a set of {@link IWingsNotification}s representing the results of the processed {@link ShareRequest}.
+     * @return a set of {@link com.groundupworks.wings.WingsEndpoint.ShareNotification}s representing the results of the processed {@link ShareRequest}.
      * May be null or an empty set.
      */
-    public abstract Set<IWingsNotification> processShareRequests();
+    public abstract Set<ShareNotification> processShareRequests();
 
     /**
      * Produces a {@link com.groundupworks.wings.WingsEndpoint.LinkEvent} subclass reflecting the current link
@@ -169,44 +169,39 @@ public abstract class WingsEndpoint {
     }
 
     /**
-     * Information associated with the link.
+     * An interface for a {@link android.app.Notification} published by Wings.
      */
-    public static class LinkInfo {
+    public static interface ShareNotification {
 
         /**
-         * The user name.
+         * @return a unique identifier for the notification within the {@link android.app.Application}.
          */
-        public final String mUserName;
+        int getId();
 
         /**
-         * The destination id.
+         * @return the title for the notification. Must not be null.
          */
-        public final int mDestinationId;
+        String getTitle();
 
         /**
-         * The destination description.
+         * @return the message for the notification. Must not be null.
          */
-        public final String mDestinationDescription;
+        String getMessage();
 
         /**
-         * Constructor.
-         *
-         * @param userName               the user name.
-         * @param destinationId          the destination id.
-         * @param destinationDescription the destination description.
+         * @return the ticker text for the notification. Must not be null.
          */
-        public LinkInfo(String userName, int destinationId, String destinationDescription) {
-            mUserName = userName;
-            mDestinationId = destinationId;
-            mDestinationDescription = destinationDescription;
-        }
+        String getTicker();
+
+        /**
+         * @return the {@link Intent} to launch an {@link Activity} when the notification is clicked. Must not be null.
+         */
+        Intent getIntent();
     }
 
     /**
      * The base class of an event emitted when the link state of an endpoint changes. The event is also
      * emitted to a subscriber immediately after subscription.
-     *
-     * @author Benedict Lau
      */
     public static abstract class LinkEvent {
 
@@ -247,6 +242,40 @@ public abstract class WingsEndpoint {
          */
         public final boolean isLinked() {
             return mIsLinked;
+        }
+    }
+
+    /**
+     * Information associated with the link.
+     */
+    public static class LinkInfo {
+
+        /**
+         * The user name.
+         */
+        public final String mUserName;
+
+        /**
+         * The destination id.
+         */
+        public final int mDestinationId;
+
+        /**
+         * The destination description.
+         */
+        public final String mDestinationDescription;
+
+        /**
+         * Constructor.
+         *
+         * @param userName               the user name.
+         * @param destinationId          the destination id.
+         * @param destinationDescription the destination description.
+         */
+        public LinkInfo(String userName, int destinationId, String destinationDescription) {
+            mUserName = userName;
+            mDestinationId = destinationId;
+            mDestinationDescription = destinationDescription;
         }
     }
 }

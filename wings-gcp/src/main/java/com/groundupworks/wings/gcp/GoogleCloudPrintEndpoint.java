@@ -24,7 +24,6 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.github.dpsm.android.print.GoogleCloudPrint;
-import com.groundupworks.wings.IWingsNotification;
 import com.groundupworks.wings.WingsEndpoint;
 import com.groundupworks.wings.core.Destination;
 import com.groundupworks.wings.core.ShareRequest;
@@ -186,8 +185,8 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
     }
 
     @Override
-    public Set<IWingsNotification> processShareRequests() {
-        final Set<IWingsNotification> notifications = new HashSet<IWingsNotification>();
+    public Set<ShareNotification> processShareRequests() {
+        final Set<ShareNotification> notifications = new HashSet<ShareNotification>();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         int shareCount = 0;
 
@@ -224,7 +223,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
             // Create and add notification.
             if (shareCount > 0) {
                 final int count = shareCount;
-                IWingsNotification notification = new IWingsNotification() {
+                ShareNotification notification = new ShareNotification() {
 
                     @Override
                     public int getId() {

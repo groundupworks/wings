@@ -27,7 +27,6 @@ import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 
 import com.groundupworks.wings.IWingsLogger;
-import com.groundupworks.wings.IWingsNotification;
 import com.groundupworks.wings.R;
 import com.groundupworks.wings.Wings;
 import com.groundupworks.wings.WingsEndpoint;
@@ -110,9 +109,9 @@ public class WingsService extends IntentService {
             Set<WingsEndpoint> endpoints = Wings.getEndpoints();
             for (WingsEndpoint endpoint : endpoints) {
                 if (endpoint.isLinked()) {
-                    Set<IWingsNotification> notifications = endpoint.processShareRequests();
+                    Set<WingsEndpoint.ShareNotification> notifications = endpoint.processShareRequests();
                     if (notifications != null) {
-                        for (IWingsNotification notification : notifications) {
+                        for (WingsEndpoint.ShareNotification notification : notifications) {
                             sendNotification(notification);
                         }
                     }
@@ -190,9 +189,9 @@ public class WingsService extends IntentService {
     }
 
     /**
-     * Sends a {@link IWingsNotification} to the notification bar.
+     * Sends a {@link com.groundupworks.wings.WingsEndpoint.ShareNotification} to the notification bar.
      */
-    private void sendNotification(IWingsNotification wingsNotification) {
+    private void sendNotification(WingsEndpoint.ShareNotification wingsNotification) {
         // Construct pending intent. The wrapped Intent must not be null as some versions of Android require it.
         Intent intent = wingsNotification.getIntent();
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

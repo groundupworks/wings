@@ -43,7 +43,6 @@ import com.facebook.SessionDefaultAudience;
 import com.facebook.SessionLoginBehavior;
 import com.facebook.SessionState;
 import com.facebook.model.GraphObject;
-import com.groundupworks.wings.IWingsNotification;
 import com.groundupworks.wings.WingsEndpoint;
 import com.groundupworks.wings.core.Destination;
 import com.groundupworks.wings.core.ShareRequest;
@@ -812,8 +811,8 @@ public class FacebookEndpoint extends WingsEndpoint {
     }
 
     @Override
-    public Set<IWingsNotification> processShareRequests() {
-        Set<IWingsNotification> notifications = new HashSet<IWingsNotification>();
+    public Set<ShareNotification> processShareRequests() {
+        Set<ShareNotification> notifications = new HashSet<ShareNotification>();
 
         // Get params associated with the linked account.
         FacebookSettings settings = fetchSettings();
@@ -917,7 +916,7 @@ public class FacebookEndpoint extends WingsEndpoint {
 
             // Construct and add notification representing share results.
             if (shared > 0) {
-                notifications.add(new FacebookNotification(mContext, destination.getHash(), settings.getAlbumName(), shared, intentUri));
+                notifications.add(new FacebookShareNotification(mContext, destination.getHash(), settings.getAlbumName(), shared, intentUri));
             }
         }
 

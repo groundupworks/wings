@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.groundupworks.wings.dropbox;
+package com.groundupworks.wings.facebook;
 
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.groundupworks.wings.IWingsNotification;
+import com.groundupworks.wings.WingsEndpoint;
 
 /**
- * {@link IWingsNotification} for Dropbox shares.
+ * {@link com.groundupworks.wings.WingsEndpoint.ShareNotification} for Facebook shares.
  *
  * @author Benedict Lau
  */
-public class DropboxNotification implements IWingsNotification {
+public class FacebookShareNotification implements WingsEndpoint.ShareNotification {
 
     private int mId;
 
@@ -43,19 +43,19 @@ public class DropboxNotification implements IWingsNotification {
      *
      * @param context   the {@link Context}.
      * @param id        the id of the notification.
-     * @param shareUrl  the share url associated with the account.
+     * @param albumName the name of the album to share to.
      * @param shared    the number of successful shares. Must be larger than 0.
-     * @param intentUri the uri to display the Dropbox app folder. May be null.
+     * @param intentUri the uri to deep link into the Facebook native app. May be null.
      */
-    DropboxNotification(Context context, int id, String shareUrl, int shared, String intentUri) {
+    FacebookShareNotification(Context context, int id, String albumName, int shared, String intentUri) {
         mId = id;
-        mTitle = context.getString(R.string.wings_dropbox__notification_shared_title);
+        mTitle = context.getString(R.string.wings_facebook__notification_shared_title);
         if (shared > 1) {
-            mMessage = context.getString(R.string.wings_dropbox__notification_shared_msg_multi, shared, shareUrl);
+            mMessage = context.getString(R.string.wings_facebook__notification_shared_msg_multi, shared, albumName);
         } else {
-            mMessage = context.getString(R.string.wings_dropbox__notification_shared_msg_single, shareUrl);
+            mMessage = context.getString(R.string.wings_facebook__notification_shared_msg_single, albumName);
         }
-        mTicker = context.getString(R.string.wings_dropbox__notification_shared_ticker);
+        mTicker = context.getString(R.string.wings_facebook__notification_shared_ticker);
         mIntentUri = intentUri;
     }
 

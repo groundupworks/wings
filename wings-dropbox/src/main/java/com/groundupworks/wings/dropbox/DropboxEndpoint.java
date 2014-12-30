@@ -31,7 +31,6 @@ import com.dropbox.client2.exception.DropboxException;
 import com.dropbox.client2.exception.DropboxServerException;
 import com.dropbox.client2.exception.DropboxUnlinkedException;
 import com.dropbox.client2.session.AppKeyPair;
-import com.groundupworks.wings.IWingsNotification;
 import com.groundupworks.wings.WingsEndpoint;
 import com.groundupworks.wings.core.Destination;
 import com.groundupworks.wings.core.ShareRequest;
@@ -378,8 +377,8 @@ public class DropboxEndpoint extends WingsEndpoint {
     }
 
     @Override
-    public Set<IWingsNotification> processShareRequests() {
-        Set<IWingsNotification> notifications = new HashSet<IWingsNotification>();
+    public Set<ShareNotification> processShareRequests() {
+        Set<ShareNotification> notifications = new HashSet<ShareNotification>();
 
         // Get access token associated with the linked account.
         String accessToken = getLinkedAccessToken();
@@ -441,7 +440,7 @@ public class DropboxEndpoint extends WingsEndpoint {
 
             // Construct and add notification representing share results.
             if (shared > 0) {
-                notifications.add(new DropboxNotification(mContext, destination.getHash(), shareUrl, shared, shareUrl));
+                notifications.add(new DropboxShareNotification(mContext, destination.getHash(), shareUrl, shared, shareUrl));
             }
         }
 

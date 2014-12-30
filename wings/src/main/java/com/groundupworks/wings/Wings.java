@@ -138,7 +138,7 @@ public final class Wings {
     /**
      * Subscribes to link state changes of the endpoints. The subscribing {@link java.lang.Object} must
      * have one or more {@link com.squareup.otto.Subscribe}-annotated methods, each taking a single
-     * parameter that corresponds to the {@link com.groundupworks.wings.WingsLinkEvent} subclass of the
+     * parameter that corresponds to the {@link com.groundupworks.wings.WingsEndpoint.LinkEvent} subclass of the
      * endpoint subscribed to.
      * <p/>
      * Upon subscription, the subscriber will immediately receive an event with the current link state
