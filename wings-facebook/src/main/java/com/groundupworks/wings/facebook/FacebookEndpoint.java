@@ -374,6 +374,9 @@ public class FacebookEndpoint extends WingsEndpoint {
             if (fragment == null) {
                 permissionsRequest = new NewPermissionsRequest(activity, publishPermissions);
             } else {
+                if (fragment.getActivity() == null) {
+                    return false;
+                }
                 permissionsRequest = new NewPermissionsRequest(fragment, publishPermissions);
             }
             permissionsRequest.setDefaultAudience(SessionDefaultAudience.EVERYONE);
