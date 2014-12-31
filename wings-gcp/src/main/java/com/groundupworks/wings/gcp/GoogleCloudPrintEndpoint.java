@@ -113,7 +113,6 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         editor.remove(mContext.getString(R.string.wings_gcp__token));
         editor.apply();
 
-
         // Emit link state change event.
         notifyLinkStateChanged(new LinkEvent(false));
 

@@ -8,6 +8,7 @@
 
         <activity
             android:name=".GoogleCloudPrintSettingsActivity"
-            android:label="@string/wings_gcp__settings__label" />
+            android:label="@string/wings_gcp__settings__label"
+            android:finishOnTaskLaunch="true" />
     </application>
 </manifest>

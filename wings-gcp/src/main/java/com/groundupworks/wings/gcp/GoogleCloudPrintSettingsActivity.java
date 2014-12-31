@@ -194,9 +194,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
     @Override
     protected void onStart() {
         super.onStart();
-        if (mOauthObservable == null) {
-            mAccountSelectionHelper.selectUserAccount(ACCOUNT_TYPE);
-        }
+        mAccountSelectionHelper.selectUserAccount(ACCOUNT_TYPE);
     }
 
     @Override
