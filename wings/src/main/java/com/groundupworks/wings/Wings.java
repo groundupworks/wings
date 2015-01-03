@@ -182,11 +182,13 @@ public final class Wings {
             throw new IllegalStateException("Wings must be initialized. See Wings#init().");
         }
         WingsEndpoint endpoint = Wings.getEndpoint(endpointClazz);
-        WingsEndpoint.LinkInfo linkInfo = endpoint.getLinkInfo();
-        if (endpoint != null && linkInfo != null
-                && WingsInjector.getDatabase().createShareRequest(filePath, new Destination(linkInfo.mDestinationId, endpoint.getEndpointId()))) {
-            WingsService.startWakefulService(WingsInjector.getApplicationContext());
-            return true;
+        if (endpoint != null) {
+            WingsEndpoint.LinkInfo linkInfo = endpoint.getLinkInfo();
+            if (linkInfo != null
+                    && WingsInjector.getDatabase().createShareRequest(filePath, new Destination(linkInfo.mDestinationId, endpoint.getEndpointId()))) {
+                WingsService.startWakefulService(WingsInjector.getApplicationContext());
+                return true;
+            }
         }
 
         return false;

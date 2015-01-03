@@ -296,9 +296,9 @@ public class FacebookAlbumListFragment extends ListFragment {
                     // If not already present, construct row to represent the default app album that will be auto
                     // created.
                     if (appAlbum == null) {
-                        appAlbum = new Object[]{APP_ALBUM_CURSOR_ID,
-                                activity.getString(R.string.wings_facebook__app_album_default_name),
-                                FacebookEndpoint.APP_ALBUM_GRAPH_PATH, FacebookEndpoint.APP_ALBUM_PRIVACY};
+                        appAlbum = new Object[]{APP_ALBUM_CURSOR_ID, FacebookEndpoint.DestinationId.PROFILE,
+                                activity.getString(R.string.wings_facebook__app_album_default_name), FacebookEndpoint.APP_ALBUM_GRAPH_PATH,
+                                FacebookEndpoint.APP_ALBUM_PRIVACY, null};
                     }
 
                     // Construct matrix cursor.
