@@ -23,6 +23,7 @@ import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.flurry.android.FlurryAgent;
 import com.github.dpsm.android.print.GoogleCloudPrint;
 import com.groundupworks.wings.WingsEndpoint;
 import com.groundupworks.wings.core.Destination;
@@ -31,6 +32,7 @@ import com.squareup.otto.Produce;
 
 import java.io.File;
 import java.net.HttpURLConnection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -206,9 +208,13 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                         Response response = mGoogleCloudPrint.submitPrintJob(token, printerIdentifier,
                                 file.getName(), ticket, new TypedFile(MIME_TYPE, file)).toBlocking().first();
                         if (response.getStatus() == HttpURLConnection.HTTP_OK) {
+                            FlurryAgent.logEvent("gcp_queue_success");
                             mDatabase.markSuccessful(shareRequest.getId());
                             shareCount++;
                         } else {
+                            final HashMap<String, String> parameters = new HashMap<>();
+                            parameters.put("code", String.valueOf(response.getStatus()));
+                            FlurryAgent.logEvent("gcp_queue_failed", parameters);
                             mDatabase.markFailed(shareRequest.getId());
                         }
                     } catch (NoSuchElementException e) {
@@ -218,6 +224,10 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                     mDatabase.markFailed(shareRequest.getId());
                 }
             }
+
+            final HashMap<String, String> parameters = new HashMap<>();
+            parameters.put("count", String.valueOf(shareCount));
+            FlurryAgent.logEvent("gcp_shared", parameters);
 
             // Create and add notification.
             if (shareCount > 0) {

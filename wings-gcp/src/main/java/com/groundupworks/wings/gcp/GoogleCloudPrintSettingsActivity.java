@@ -31,6 +31,7 @@ import com.dpsmarques.android.auth.GoogleOauthTokenObservable;
 import com.dpsmarques.android.auth.activity.OperatorGoogleAuthenticationActivityController;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.flurry.android.FlurryAgent;
 import com.github.dpsm.android.print.GoogleCloudPrint;
 import com.github.dpsm.android.print.jackson.JacksonPrinterSearchResultOperator;
 import com.github.dpsm.android.print.jackson.model.JacksonPrinterSearchResult;
@@ -47,6 +48,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -278,6 +280,11 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
 
     private void onPrinterSearchResult(final JacksonPrinterSearchResult result) {
         final List<Printer> printers = result.getPrinters();
+
+        final HashMap<String, String> parameters = new HashMap<>();
+        parameters.put("sizes", String.valueOf(printers.size()));
+        FlurryAgent.logEvent("gcp_search_printer_success", parameters);
+
         if (printers != null && printers.size() > 0) {
             mPrinterSpinner.setAdapter(new ArrayAdapter<Printer>(
                     GoogleCloudPrintSettingsActivity.this, R.layout.gcp_settings_spinner_item,
@@ -291,6 +298,10 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
     private void onPrinterDetails(final Response response) {
         if (response.getStatus() == HttpURLConnection.HTTP_OK) {
             final List<MediaSize> sizes = parseMediaSizes(response);
+            final HashMap<String, String> parameters = new HashMap<>();
+            parameters.put("sizes", String.valueOf(sizes.size()));
+            FlurryAgent.logEvent("gcp_details_success", parameters);
+
             final boolean hasMediaSize = !sizes.isEmpty();
             if (hasMediaSize) {
                 mMediaSpinner.setAdapter(new ArrayAdapter<MediaSize>(
@@ -298,6 +309,10 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
                         R.id.activity_main_spinner_item_text, sizes));
             }
             mMediaSpinner.setVisibility(hasMediaSize ? View.VISIBLE : View.GONE);
+        } else {
+            final HashMap<String, String> parameters = new HashMap<>();
+            parameters.put("code", String.valueOf(response.getStatus()));
+            FlurryAgent.logEvent("gcp_details_failed", parameters);
         }
     }
 
