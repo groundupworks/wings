@@ -23,5 +23,5 @@ dependencies {
     compile 'com.squareup:otto:1.3.5'
     compile 'com.squareup.dagger:dagger:1.2.2'
     provided 'com.squareup.dagger:dagger-compiler:1.2.2'
-    compile files('libs/FlurryAnalytics-5.0.0.jar')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 }

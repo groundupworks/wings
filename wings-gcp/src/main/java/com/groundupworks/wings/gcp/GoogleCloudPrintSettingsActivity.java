@@ -31,11 +31,12 @@ import com.dpsmarques.android.auth.GoogleOauthTokenObservable;
 import com.dpsmarques.android.auth.activity.OperatorGoogleAuthenticationActivityController;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.flurry.android.FlurryAgent;
 import com.github.dpsm.android.print.GoogleCloudPrint;
 import com.github.dpsm.android.print.jackson.JacksonPrinterSearchResultOperator;
 import com.github.dpsm.android.print.jackson.model.JacksonPrinterSearchResult;
 import com.github.dpsm.android.print.model.Printer;
+import com.groundupworks.wings.IWingsLogger;
+import com.groundupworks.wings.core.WingsInjector;
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
@@ -52,6 +53,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import retrofit.client.Response;
 import rx.Observable;
@@ -112,6 +115,8 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
             Toast.makeText(getApplicationContext(), R.string.wings_gcp__settings__error_no_printer, Toast.LENGTH_SHORT).show();
         }
     };
+
+    private IWingsLogger mLogger;
 
     private GoogleCloudPrint mGoogleCloudPrint;
     private AccountSelectionActivityHelper mAccountSelectionHelper;
@@ -175,6 +180,8 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
                 }
             }
         });
+
+        mLogger = WingsInjector.getLogger();
     }
 
     private void onPrinterSelected(final int position) {
@@ -283,7 +290,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
 
         final HashMap<String, String> parameters = new HashMap<>();
         parameters.put("sizes", String.valueOf(printers.size()));
-        FlurryAgent.logEvent("gcp_search_printer_success", parameters);
+        mLogger.log("gcp_search_printer_success", parameters);
 
         if (printers != null && printers.size() > 0) {
             mPrinterSpinner.setAdapter(new ArrayAdapter<Printer>(
@@ -300,7 +307,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
             final List<MediaSize> sizes = parseMediaSizes(response);
             final HashMap<String, String> parameters = new HashMap<>();
             parameters.put("sizes", String.valueOf(sizes.size()));
-            FlurryAgent.logEvent("gcp_details_success", parameters);
+            mLogger.log("gcp_details_success", parameters);
 
             final boolean hasMediaSize = !sizes.isEmpty();
             if (hasMediaSize) {
@@ -312,7 +319,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
         } else {
             final HashMap<String, String> parameters = new HashMap<>();
             parameters.put("code", String.valueOf(response.getStatus()));
-            FlurryAgent.logEvent("gcp_details_failed", parameters);
+            mLogger.log("gcp_details_failed", parameters);
         }
     }
 
