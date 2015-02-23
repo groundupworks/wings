@@ -53,6 +53,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -761,6 +762,10 @@ public class FacebookEndpoint extends WingsEndpoint {
                 // session callback.
                 if (!finishOpenSessionRequest(activity, requestCode, resultCode, data)) {
                     handleLinkError();
+                    final HashMap<String, String> parameters = new HashMap<>();
+                    parameters.put("state", "STATE_OPEN_SESSION_REQUEST");
+                    parameters.put("transition_failed", "finishOpenSessionRequest()");
+                    sLogger.log("facebook_link_error", parameters);
                 }
                 break;
             }
@@ -769,9 +774,17 @@ public class FacebookEndpoint extends WingsEndpoint {
                     // Start request for settings.
                     if (!startSettingsRequest(activity, fragment)) {
                         handleLinkError();
+                        final HashMap<String, String> parameters = new HashMap<>();
+                        parameters.put("state", "STATE_PUBLISH_PERMISSIONS_REQUEST");
+                        parameters.put("transition_failed", "startSettingsRequest()");
+                        sLogger.log("facebook_link_error", parameters);
                     }
                 } else {
                     handleLinkError();
+                    final HashMap<String, String> parameters = new HashMap<>();
+                    parameters.put("state", "STATE_PUBLISH_PERMISSIONS_REQUEST");
+                    parameters.put("transition_failed", "finishOpenSessionRequest()");
+                    sLogger.log("facebook_link_error", parameters);
                 }
                 break;
             }
@@ -787,6 +800,10 @@ public class FacebookEndpoint extends WingsEndpoint {
                     mLinkRequestState = STATE_NONE;
                 } else {
                     handleLinkError();
+                    final HashMap<String, String> parameters = new HashMap<>();
+                    parameters.put("state", "STATE_SETTINGS_REQUEST");
+                    parameters.put("transition_failed", "link()");
+                    sLogger.log("facebook_link_error", parameters);
                 }
                 break;
             }
