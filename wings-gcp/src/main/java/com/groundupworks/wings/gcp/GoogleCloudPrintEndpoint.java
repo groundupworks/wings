@@ -214,8 +214,8 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                     try {
                         Response response = mGoogleCloudPrint.submitPrintJob(token, printerIdentifier,
                                 file.getName(), ticket, new TypedFile(MIME_TYPE, file)).toBlocking().first();
+                        final HashMap<String, String> parameters = new HashMap<>();
                         if (response.getStatus() == HttpURLConnection.HTTP_OK) {
-                            final HashMap<String, String> parameters = new HashMap<>();
                             try {
                                 final GcpResponse gcpResponse = JsonPath.parse(response.getBody().in())
                                         .read("$", GcpResponse.class);
@@ -229,14 +229,14 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                                     sLogger.log("gcp_queue_failed", parameters);
                                 }
                             } catch (IOException e) {
+                                mDatabase.markFailed(shareRequest.getId());
                                 parameters.put("error", e.getMessage());
                                 sLogger.log("gcp_queue_failed", parameters);
                             }
                         } else {
-                            final HashMap<String, String> parameters = new HashMap<>();
+                            mDatabase.markFailed(shareRequest.getId());
                             parameters.put("code", String.valueOf(response.getStatus()));
                             sLogger.log("gcp_queue_failed", parameters);
-                            mDatabase.markFailed(shareRequest.getId());
                         }
                     } catch (NoSuchElementException e) {
                         mDatabase.markFailed(shareRequest.getId());
