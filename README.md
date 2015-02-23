@@ -1,6 +1,8 @@
 Wings
 ====
 
+[![Build Status](https://travis-ci.org/groundupworks/wings.svg?branch=master)](https://travis-ci.org/groundupworks/wings)
+
 Wings is an Android library for silently sharing photos to an extensible set of endpoints. The currently supported endpoints include:
 
 * Dropbox
