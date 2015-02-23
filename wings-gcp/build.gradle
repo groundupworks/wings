@@ -19,7 +19,6 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile('com.github.dpsm:android-auth:1.0.0') {
         exclude module: 'support-v4'
         exclude module: 'rxjava-android'
@@ -30,7 +29,8 @@ dependencies {
     }
     compile 'com.netflix.rxjava:rxjava-android:0.20.6'
     compile ('com.jayway.jsonpath:json-path:1.2.0') {
-        exclude module: 'asm'
+        exclude group: 'asm'
     }
+    compile 'commons-io:commons-io:2.4'
     compile project(':wings')
 }

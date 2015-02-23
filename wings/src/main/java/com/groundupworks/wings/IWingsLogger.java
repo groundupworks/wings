@@ -15,6 +15,8 @@
  */
 package com.groundupworks.wings;
 
+import java.util.Map;
+
 /**
  * An interface for printing logs.
  *
@@ -30,4 +32,8 @@ public interface IWingsLogger {
      * @param msg        the debug message.
      */
     public void log(Class<?> clazz, String methodName, String msg);
+
+    public void log(String eventName, Map<String, String> eventParameters);
+
+    public void log(String eventName);
 }
