@@ -89,6 +89,12 @@ public class WingsService extends IntentService {
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        sLogger.onWingsServiceCreated(this);
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Acquire lock when the service is started from a redelivered intent.
         if ((flags & START_FLAG_REDELIVERY) != 0) {
@@ -132,6 +138,12 @@ public class WingsService extends IntentService {
         } finally {
             releaseWakeLock();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        sLogger.onWingsServiceDestroyed(this);
+        super.onDestroy();
     }
 
     //
