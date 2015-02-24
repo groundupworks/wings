@@ -15,6 +15,8 @@
  */
 package com.groundupworks.wings;
 
+import com.groundupworks.wings.core.WingsService;
+
 import java.util.Map;
 
 /**
@@ -33,7 +35,32 @@ public interface IWingsLogger {
      */
     public void log(Class<?> clazz, String methodName, String msg);
 
+    /**
+     * Logs an event.
+     *
+     * @param eventName       the name of the event.
+     * @param eventParameters the parameters associated with the event.
+     */
     public void log(String eventName, Map<String, String> eventParameters);
 
+    /**
+     * Logs an event.
+     *
+     * @param eventName the name of the event.
+     */
     public void log(String eventName);
+
+    /**
+     * Lifecycle callback when a {@link com.groundupworks.wings.core.WingsService} instance is created.
+     *
+     * @param service the {@link com.groundupworks.wings.core.WingsService} instance.
+     */
+    public void onWingsServiceCreated(WingsService service);
+
+    /**
+     * Lifecycle callback when a {@link com.groundupworks.wings.core.WingsService} instance is destroyed.
+     *
+     * @param service the {@link com.groundupworks.wings.core.WingsService} instance.
+     */
+    public void onWingsServiceDestroyed(WingsService service);
 }
