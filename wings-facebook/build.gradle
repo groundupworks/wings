@@ -19,6 +19,6 @@ android {
 }
 
 dependencies {
-    compile project(':facebook')
+    compile 'com.facebook.android:facebook-android-sdk:3.23.1'
     compile project(':wings')
 }
