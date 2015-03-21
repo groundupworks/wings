@@ -28,13 +28,16 @@ configure(projects([':wings',
 
 Set<Project> projects(Collection<String> paths) {
     def projects = []
-    paths.each() { path -> projects << project(path) };
+    paths.each() { path -> projects << project(path) }
     return projects
 }
 
 void configureProject(Project project) {
     configure(project) {
+        project.ext.set("SNAPSHOT_REPOSITORY_URL", "file://${System.getProperty("user.home")}/.m2/repository/")
+
         apply plugin: 'com.android.library'
+        apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
 
         android {
             buildToolsVersion '22.0.0'
@@ -44,7 +47,7 @@ void configureProject(Project project) {
                 minSdkVersion 10
                 targetSdkVersion 22
                 versionCode 0
-                versionName WINGS_VERSION
+                versionName VERSION_NAME
             }
             buildTypes {
                 release {
