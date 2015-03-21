@@ -1,5 +1,6 @@
 # Android Studio
-.idea/workspace.xml
+.idea/
+*.iml
 
 # gradle build
 **/build/
