@@ -1,15 +1,16 @@
 dependencies {
     compile('com.github.dpsm:android-auth:1.0.0') {
-        exclude module: 'support-v4'
-        exclude module: 'rxjava-android'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.netflix.rxjava', module: 'rxjava-android'
     }
     compile('com.github.dpsm:android-print:1.0.0') {
-        exclude module: 'support-v4'
-        exclude module: 'rxjava-android'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.netflix.rxjava', module: 'rxjava-android'
+        exclude group: 'com.github.dpsm', module: 'android-auth'
     }
     compile 'com.netflix.rxjava:rxjava-android:0.20.6'
     compile ('com.jayway.jsonpath:json-path:1.2.0') {
-        exclude group: 'asm'
+        exclude group: 'asm', module: 'asm'
     }
     compile 'commons-io:commons-io:2.4'
     compile project(':wings')
