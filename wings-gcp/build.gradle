@@ -1,5 +1,5 @@
 dependencies {
-    compile('com.github.dpsm:android-auth:1.0.0@aar') {
+    compile('com.github.dpsm:android-auth:1.0.0') {
         exclude module: 'support-v4'
         exclude module: 'rxjava-android'
     }
