@@ -10,6 +10,9 @@
     <string name="wings_facebook__notification_shared_msg_multi">+%1$d photos to %2$s</string>
     <string name="wings_facebook__notification_shared_ticker">Facebook share completed</string>
 
+    <!-- Facebook Login Activity -->
+    <string name="wings_facebook__login__label">Connect Facebook</string>
+
     <!-- Facebook Settings Activity -->
     <string name="wings_facebook__settings__label">Select photo album</string>
 
