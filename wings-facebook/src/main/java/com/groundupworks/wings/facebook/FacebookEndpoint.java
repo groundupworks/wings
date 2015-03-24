@@ -106,9 +106,16 @@ public class FacebookEndpoint extends WingsEndpoint {
     private static final String PERMISSION_PUBLISH_ACTIONS = "publish_actions";
 
     /**
-     * Request code to use for {@link Activity#startActivityForResult(android.content.Intent, int)}.
+     * Request code to use for {@link Activity#startActivityForResult(android.content.Intent, int)}
+     * with {@link com.groundupworks.wings.facebook.FacebookLoginActivity}.
      */
-    private static final int SETTINGS_REQUEST_CODE = ENDPOINT_ID;
+    private static final int LOGIN_REQUEST_CODE = ENDPOINT_ID << 4;
+
+    /**
+     * Request code to use for {@link Activity#startActivityForResult(android.content.Intent, int)}
+     * with {@link com.groundupworks.wings.facebook.FacebookSettingsActivity}.
+     */
+    private static final int SETTINGS_REQUEST_CODE = ENDPOINT_ID << 4 + 1;
 
     //
     // Link request state machine.
@@ -116,11 +123,13 @@ public class FacebookEndpoint extends WingsEndpoint {
 
     private static final int STATE_NONE = -1;
 
-    private static final int STATE_OPEN_SESSION_REQUEST = 0;
+    private static final int STATE_LOGIN_REQUEST = 0;
 
-    private static final int STATE_PUBLISH_PERMISSIONS_REQUEST = 1;
+    private static final int STATE_OPEN_SESSION_REQUEST = 1;
 
-    private static final int STATE_SETTINGS_REQUEST = 2;
+    private static final int STATE_PUBLISH_PERMISSIONS_REQUEST = 2;
+
+    private static final int STATE_SETTINGS_REQUEST = 3;
 
     //
     // Account listing params.
@@ -289,13 +298,25 @@ public class FacebookEndpoint extends WingsEndpoint {
     /**
      * Opens a new session with read permissions.
      *
-     * @param activity       the {@link Activity}.
-     * @param fragment       the {@link Fragment}. May be null.
-     * @param statusCallback callback when the {@link Session} state changes.
+     * @param activity the {@link Activity}.
+     * @param fragment the {@link Fragment}. May be null.
      */
-    private void startOpenSessionRequest(Activity activity, Fragment fragment, Session.StatusCallback statusCallback) {
+    private void startOpenSessionRequest(final Activity activity, final Fragment fragment) {
         // State transition.
         mLinkRequestState = STATE_OPEN_SESSION_REQUEST;
+
+        // Construct status callback.
+        Session.StatusCallback statusCallback = new Session.StatusCallback() {
+            @Override
+            public void call(Session session, SessionState state, Exception exception) {
+                if (mLinkRequestState == STATE_OPEN_SESSION_REQUEST && state.isOpened()) {
+                    // Request publish permissions.
+                    if (!startPublishPermissionsRequest(activity, fragment)) {
+                        handleLinkError();
+                    }
+                }
+            }
+        };
 
         // Construct new session.
         Session session = new Session(activity);
@@ -326,7 +347,7 @@ public class FacebookEndpoint extends WingsEndpoint {
     }
 
     /**
-     * Finishes a {@link com.groundupworks.wings.facebook.FacebookEndpoint#startOpenSessionRequest(android.app.Activity, android.support.v4.app.Fragment, com.facebook.Session.StatusCallback)}.
+     * Finishes a {@link com.groundupworks.wings.facebook.FacebookEndpoint#startOpenSessionRequest(android.app.Activity, android.support.v4.app.Fragment)}.
      *
      * @param activity    the {@link Activity}.
      * @param requestCode the integer request code originally supplied to startActivityForResult(), allowing you to identify who
@@ -699,22 +720,15 @@ public class FacebookEndpoint extends WingsEndpoint {
     }
 
     @Override
-    public void startLinkRequest(final Activity activity, final Fragment fragment) {
-        // Construct status callback.
-        Session.StatusCallback statusCallback = new Session.StatusCallback() {
-            @Override
-            public void call(Session session, SessionState state, Exception exception) {
-                if (mLinkRequestState == STATE_OPEN_SESSION_REQUEST && state.isOpened()) {
-                    // Request publish permissions.
-                    if (!startPublishPermissionsRequest(activity, fragment)) {
-                        handleLinkError();
-                    }
-                }
-            }
-        };
+    public void startLinkRequest(Activity activity, Fragment fragment) {
+        mLinkRequestState = STATE_LOGIN_REQUEST;
 
-        // Open session.
-        startOpenSessionRequest(activity, fragment, statusCallback);
+        Intent intent = new Intent(activity, FacebookLoginActivity.class);
+        if (fragment == null) {
+            activity.startActivityForResult(intent, LOGIN_REQUEST_CODE);
+        } else {
+            fragment.startActivityForResult(intent, LOGIN_REQUEST_CODE);
+        }
     }
 
     @Override
@@ -723,7 +737,7 @@ public class FacebookEndpoint extends WingsEndpoint {
         removeSettings();
 
         // Unlink any current session.
-        Session session = Session.getActiveSession();
+        Session session = Session.openActiveSessionFromCache(mContext);
         if (session != null && !session.isClosed()) {
             session.closeAndClearTokenInformation();
         }
@@ -757,6 +771,18 @@ public class FacebookEndpoint extends WingsEndpoint {
     public void onActivityResultImpl(Activity activity, Fragment fragment, int requestCode, int resultCode, Intent data) {
         // State machine to handle the linking process.
         switch (mLinkRequestState) {
+            case STATE_LOGIN_REQUEST: {
+                if (requestCode == LOGIN_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+                    startOpenSessionRequest(activity, fragment);
+                } else {
+                    handleLinkError();
+                    final HashMap<String, String> parameters = new HashMap<>();
+                    parameters.put("state", "STATE_LOGIN_REQUEST");
+                    parameters.put("transition_failed", "requestCode=" + requestCode + " resultCode=" + resultCode);
+                    sLogger.log("facebook_link_error", parameters);
+                }
+                break;
+            }
             case STATE_OPEN_SESSION_REQUEST: {
                 // Only handle the error case. If successful, the publish permissions request will be started by a
                 // session callback.

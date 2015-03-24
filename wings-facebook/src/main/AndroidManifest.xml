@@ -10,6 +10,9 @@
             android:name="com.facebook.LoginActivity"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
+            android:name=".FacebookLoginActivity"
+            android:label="@string/wings_facebook__login__label" />
+        <activity
             android:name=".FacebookSettingsActivity"
             android:label="@string/wings_facebook__settings__label" />
     </application>
