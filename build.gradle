@@ -5,7 +5,6 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:1.1.3'
-        classpath 'com.github.dcendents:android-maven-plugin:1.2'
     }
 }
 
@@ -18,6 +17,10 @@ allprojects {
 
 ext {
     supportV4Version = '22.0.0'
+    if (LOCAL.toBoolean()) {
+        RELEASE_REPOSITORY_URL = "file://${System.getProperty("user.home")}/.m2/repository"
+        SNAPSHOT_REPOSITORY_URL = "file://${System.getProperty("user.home")}/.m2/repository/snapshots"
+    }
 }
 
 configure(projects([':wings',
@@ -36,10 +39,8 @@ Set<Project> projects(Collection<String> paths) {
 void configureProject(Project project) {
     configure(project) {
         apply plugin: 'com.android.library'
-        apply plugin: 'com.github.dcendents.android-maven'
-        apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+        apply from: rootProject.file('gradle-mvn-push.gradle')
 
-        // Configurations for 'com.github.dcendents.android-maven'
         group = GROUP
         version = VERSION_NAME
 
