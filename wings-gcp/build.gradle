@@ -1,12 +1,11 @@
 dependencies {
-    compile('com.github.dpsm:android-auth:1.0.0') {
+    compile('com.groundupworks.android:google-auth:1.0.3') {
         exclude group: 'com.android.support', module: 'support-v4'
         exclude group: 'com.netflix.rxjava', module: 'rxjava-android'
     }
-    compile('com.github.dpsm:android-print:1.0.0') {
+    compile('com.groundupworks.android:cloud-print:1.0.0') {
         exclude group: 'com.android.support', module: 'support-v4'
         exclude group: 'com.netflix.rxjava', module: 'rxjava-android'
-        exclude group: 'com.github.dpsm', module: 'android-auth'
     }
     compile 'com.netflix.rxjava:rxjava-android:0.20.6'
     compile ('com.jayway.jsonpath:json-path:1.2.0') {
