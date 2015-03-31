@@ -49,6 +49,7 @@ import retrofit.client.Response;
 import retrofit.mime.TypedFile;
 
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_ACCOUNT;
+import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_COPIES;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_MEDIA;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_PRINTER;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_PRINTER_NAME;
@@ -68,6 +69,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
             "    \"color\": {\n" +
             "      \"type\": \"STANDARD_COLOR\"\n" +
             "    },\n" +
+            "    \"copies\": {\"copies\": %d}," +
             "    \"media_size\": {\n" +
             "      \"width_microns\": 1,\n" +
             "      \"height_microns\": 1,\n" +
@@ -81,6 +83,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
             "  \"version\": \"1.0\",\n" +
             "  \"print\": {\n" +
             "    \"vendor_ticket_item\": [],\n" +
+            "    \"copies\": {\"copies\": %d}," +
             "    \"color\": {\n" +
             "      \"type\": \"STANDARD_COLOR\"\n" +
             "    }\n" +
@@ -120,6 +123,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         editor.remove(mContext.getString(R.string.wings_gcp__printer_identifier_key));
         editor.remove(mContext.getString(R.string.wings_gcp__media));
         editor.remove(mContext.getString(R.string.wings_gcp__token));
+        editor.remove(mContext.getString(R.string.wings_gcp__copies));
         editor.apply();
 
         // Emit link state change event.
@@ -156,6 +160,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                 String printerName = data.getStringExtra(EXTRA_PRINTER_NAME);
                 String media = data.getStringExtra(EXTRA_MEDIA);
                 String token = data.getStringExtra(EXTRA_TOKEN);
+                String copies = data.getStringExtra(EXTRA_COPIES);
 
                 if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier) && !TextUtils.isEmpty(token)) {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
@@ -165,6 +170,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                     editor.putString(mContext.getString(R.string.wings_gcp__printer_name_key), printerName);
                     editor.putString(mContext.getString(R.string.wings_gcp__media), media);
                     editor.putString(mContext.getString(R.string.wings_gcp__token), token);
+                    editor.putString(mContext.getString(R.string.wings_gcp__copies), copies);
                     editor.apply();
 
                     // Emit link state change event.
@@ -203,9 +209,10 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         final String printerIdentifier = preferences.getString(mContext.getString(R.string.wings_gcp__printer_identifier_key), null);
         final String media = preferences.getString(mContext.getString(R.string.wings_gcp__media), null);
         final String token = preferences.getString(mContext.getString(R.string.wings_gcp__token), null);
+        final String copies = preferences.getString(mContext.getString(R.string.wings_gcp__copies), null);
         if (isLinked && !TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier) &&
                 !TextUtils.isEmpty(token)) {
-            final String ticket = !TextUtils.isEmpty(media) ? String.format(TICKET_WITH_MEDIA, media) : TICKET;
+            final String ticket = !TextUtils.isEmpty(media) ? String.format(TICKET_WITH_MEDIA, copies, media) : String.format(TICKET, copies);
             final Destination destination = new Destination(DestinationId.PRINT_QUEUE, ENDPOINT_ID);
             List<ShareRequest> shareRequests = mDatabase.checkoutShareRequests(destination);
             for (ShareRequest shareRequest : shareRequests) {

@@ -12,11 +12,33 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/wings_gcp__settings__copies_text"
+        android:id="@+id/gcp_activity_settings_spinner_copies"
+        android:layout_below="@+id/gcp_activity_settings_spinner_printers"
+        android:layout_alignLeft="@+id/gcp_activity_settings_spinner_printers"
+        android:layout_alignStart="@+id/gcp_activity_settings_spinner_printers" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/gcp_activity_settings_spinner_copies_text"
+        android:layout_below="@+id/gcp_activity_settings_spinner_printers"
+        android:layout_alignRight="@+id/gcp_activity_settings_spinner_copies"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:text="@string/gcp_activity_settings_spinner_copies_text_default"/>
+
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/gcp_activity_settings_spinner_media_sizes"
-        android:layout_below="@id/gcp_activity_settings_spinner_printers"
+        android:layout_below="@id/gcp_activity_settings_spinner_copies_text"
         android:layout_centerHorizontal="true"
         android:visibility="gone"/>
 
