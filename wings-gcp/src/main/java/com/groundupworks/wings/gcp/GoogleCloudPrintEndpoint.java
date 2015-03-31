@@ -25,19 +25,15 @@ import android.widget.Toast;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.github.dpsm.android.print.GoogleCloudPrint;
+import com.groundupworks.android.print.GoogleCloudPrint;
 import com.groundupworks.wings.WingsEndpoint;
 import com.groundupworks.wings.core.Destination;
 import com.groundupworks.wings.core.ShareRequest;
 import com.jayway.jsonpath.JsonPath;
 import com.squareup.otto.Produce;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -220,7 +216,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                 if (file.exists()) {
                     try {
                         Response response = mGoogleCloudPrint.submitPrintJob(token, printerIdentifier,
-                                file.getName(), ticket, new TypedFile(MIME_TYPE, file)).toBlocking().first();
+                                file.getName(), ticket, new TypedFile(MIME_TYPE, file), MIME_TYPE).toBlocking().first();
                         final HashMap<String, String> parameters = new HashMap<>();
                         if (response.getStatus() == HttpURLConnection.HTTP_OK) {
                             try {
