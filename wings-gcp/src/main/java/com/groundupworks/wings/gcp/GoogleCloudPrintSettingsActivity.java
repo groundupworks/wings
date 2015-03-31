@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -106,8 +107,10 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
     static final String EXTRA_PRINTER_NAME = "printer_name";
     static final String EXTRA_TOKEN = "token";
     static final String EXTRA_MEDIA = "media";
+    static final String EXTRA_COPIES = "copies";
 
     private static final int REQUEST_CODE_BASE = 1000;
+    public static final String DEFAULT_COUNT = "1";
 
     private final Action1<Throwable> mShowPrinterNotFoundAction = new Action1<Throwable>() {
         @Override
@@ -129,6 +132,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
     private Button mSelectPrinterButton;
     private Spinner mPrinterSpinner;
     private Spinner mMediaSpinner;
+    private EditText mCountText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +143,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
         mAccountSelectionHelper = new AccountSelectionActivityHelper(this, REQUEST_CODE_BASE);
         mGoogleCloudPrint = new GoogleCloudPrint();
 
+        mCountText = (EditText) findViewById(R.id.gcp_activity_settings_spinner_copies_text);
         mSelectPrinterButton = (Button) findViewById(R.id.gcp_activity_settings_button_link);
         mPrinterSpinner = (Spinner) findViewById(R.id.gcp_activity_settings_spinner_printers);
         mPrinterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -173,7 +178,12 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
                         if (selectedMedia != null) {
                             intent.putExtra(EXTRA_MEDIA, selectedMedia.id);
                         }
-
+                        final String count = mCountText.getText().toString();
+                        if (!TextUtils.isEmpty(count)) {
+                            intent.putExtra(EXTRA_COPIES, count);
+                        } else {
+                            intent.putExtra(EXTRA_COPIES, DEFAULT_COUNT);
+                        }
                         setResult(Activity.RESULT_OK, intent);
                         finish();
                     }
