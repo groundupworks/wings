@@ -27,11 +27,11 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.groundupworks.android.account.activity.AccountSelectionActivityHelper;
 import com.groundupworks.android.auth.GoogleOauthTokenObservable;
 import com.groundupworks.android.auth.activity.OperatorGoogleAuthenticationActivityController;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.groundupworks.android.print.GoogleCloudPrint;
 import com.groundupworks.android.print.jackson.JacksonPrinterSearchResultOperator;
 import com.groundupworks.android.print.jackson.model.JacksonPrinterSearchResult;
@@ -54,8 +54,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import javax.inject.Inject;
 
 import retrofit.client.Response;
 import rx.Observable;

@@ -7,6 +7,10 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-v4'
         exclude group: 'com.netflix.rxjava', module: 'rxjava-android'
     }
+
+    // Required by com.groundupworks.android:cloud-print:1.0.0
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
+
     compile 'io.reactivex:rxandroid:0.23.0'
     compile ('com.jayway.jsonpath:json-path:1.2.0') {
         exclude group: 'asm', module: 'asm'
