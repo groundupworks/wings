@@ -4,7 +4,10 @@
     <string name="wings_gcp__account_name_key">wings_gcp__account_name_key</string>
     <string name="wings_gcp__printer_identifier_key">wings_gcp__printer_identifier_key</string>
     <string name="wings_gcp__printer_name_key">wings_gcp__printer_name_key</string>
-    <string name="wings_gcp__media">wings_gcp__media</string>
     <string name="wings_gcp__token">wings_gcp__token</string>
     <string name="wings_gcp__copies">wings_gcp__copies</string>
+    <string name="wings_gcp__media_vendor_id">wings_gcp__media_vendor_id</string>
+    <string name="wings_gcp__media_width_microns">wings_gcp__media_width_microns</string>
+    <string name="wings_gcp__media_height_microns">wings_gcp__media_height_microns</string>
+    <string name="wings_gcp__media_is_continuous_feed">wings_gcp__media_is_continuous_feed</string>
 </resources>
