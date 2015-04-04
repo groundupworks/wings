@@ -46,34 +46,13 @@
 <h2>
 <a id="adding-wings-to-your-project" class="anchor" href="#adding-wings-to-your-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding Wings to your project</h2>
 
-<p>The Wings library builds multiple artifacts—the core <strong>wings.aar</strong> and an AAR per endpoint, such as <strong>wings-dropbox.aar</strong>. You will only need to include the core library and the endpoints applicable to your application. The recommended way to integrate with Wings is to add the source to your application, but you can also add the AARs instead. The following instructions assume you are building with Gradle in Android Studio.</p>
+<p>The Wings library builds multiple artifacts—the core <strong>wings.aar</strong> and an AAR per endpoint, such as <strong>wings-dropbox.aar</strong>. You will only need to include the core library and the endpoints applicable to your application. Assuming you are building with Gradle in Android Studio, start by adding the following dependencies to your application's <strong>build.gradle</strong>.</p>
 
-<h3>
-<a id="adding-wings-as-source" class="anchor" href="#adding-wings-as-source" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding Wings as source</h3>
-
-<p>Clone the Wings source.</p>
-
-<pre><code>$ git clone https://github.com/groundupworks/wings.git
+<pre><code>compile 'com.groundupworks.wings:wings:1.0.3'
+compile 'com.groundupworks.wings:wings-dropbox:1.0.3'  // For Dropbox
+compile 'com.groundupworks.wings:wings-facebook:1.0.3' // For Facebook
+compile 'com.groundupworks.wings:wings-gcp:1.0.3'      // For Google Drive or Cloud Print
 </code></pre>
-
-<p>Or if you use <a href="http://git-scm.com/book/en/v2/Git-Tools-Submodules">Submodules</a>, add Wings as a submodule to your project.</p>
-
-<pre><code>$ git submodule add https://github.com/groundupworks/wings.git
-</code></pre>
-
-<p>Then from your project in Android Studio, <strong>Import Module...</strong> from the root <strong>wings</strong> folder, and you should see the list of all Wings modules. Select <strong>wings</strong> and the endpoints you want your application to share to. Complete the import, and your project's <strong>settings.gradle</strong> should now contain the Wings modules.</p>
-
-<p>Now you need to add these modules as dependencies in your application's <strong>build.gradle</strong>.</p>
-
-<pre><code>dependencies {
-    compile project(':wings')
-    compile project(':wings-dropbox')     // If applicable
-    compile project(':wings-facebook')    // If applicable
-    compile project(':wings-gcp')         // If applicable
-}
-</code></pre>
-
-<p>Rebuild your project, and say a prayer to the Gradle gods.</p>
 
 <h2>
 <a id="setting-up-the-endpoints" class="anchor" href="#setting-up-the-endpoints" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setting up the endpoints</h2>
@@ -152,14 +131,44 @@ public void handleLinkEvent(DropboxEndpoint.LinkEvent event) {
 </code></pre>
 
 <h2>
-<a id="creating-a-new-endpoint" class="anchor" href="#creating-a-new-endpoint" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating a new endpoint</h2>
+<a id="extending-wings" class="anchor" href="#extending-wings" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extending Wings</h2>
 
-<p>If you intend to create a new endpoint, it'd probably be a good idea to fork the Git repo instead of cloning it. Then create a concrete implementation of <code>WingsEndpoint</code>, and you'll have a new endpoint. The best way to start is to look at how an existing endpoint implements all the interfaces. Once the new endpoint is created, remember to pass it to <code>Wings#init()</code> and consider submitting a pull request from your fork :)</p>
+<p>If you intend to create a new endpoint, it'd probably be a good idea to fork the Git repo and add it to your project as source.</p>
+
+<h3>
+<a id="adding-wings-as-source" class="anchor" href="#adding-wings-as-source" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding Wings as source</h3>
+
+<p>Clone the Wings source.</p>
+
+<pre><code>$ git clone https://github.com/groundupworks/wings.git
+</code></pre>
+
+<p>Or if you use <a href="http://git-scm.com/book/en/v2/Git-Tools-Submodules">Submodules</a>, add Wings as a submodule to your project.</p>
+
+<pre><code>$ git submodule add https://github.com/groundupworks/wings.git
+</code></pre>
+
+<p>Then from your project in Android Studio, <strong>Import Module...</strong> from the root <strong>wings</strong> folder, and you should see the list of all Wings modules. Select <strong>wings</strong> and the endpoints you want your application to share to. Complete the import, and your project's <strong>settings.gradle</strong> should now contain the Wings modules.</p>
+
+<p>Now you need to add these modules as dependencies in your application's <strong>build.gradle</strong>.</p>
+
+<pre><code>dependencies {
+    compile project(':wings')
+    compile project(':wings-dropbox')  // For Dropbox
+    compile project(':wings-facebook') // For Facebook
+    compile project(':wings-gcp')      // For Google Drive or Cloud Print
+}
+</code></pre>
+
+<h3>
+<a id="creating-a-new-endpoint" class="anchor" href="#creating-a-new-endpoint" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating a new endpoint</h3>
+
+<p>To create a new endpoint, you need to implement a new <code>WingsEndpoint</code>. The best way to start is to look at how an existing endpoint implements all the interfaces. Once the new endpoint is created, remember to pass it to <code>Wings#init()</code> and consider submitting a pull request from your fork :)</p>
         </section>
 
         <footer>
           Wings is maintained by <a href="https://github.com/groundupworks">groundupworks</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
         </footer>
 
         
