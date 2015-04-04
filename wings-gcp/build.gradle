@@ -1,13 +1,17 @@
 dependencies {
     compile('com.groundupworks.android:google-auth:1.0.3') {
         exclude group: 'com.android.support', module: 'support-v4'
-        exclude group: 'com.netflix.rxjava', module: 'rxjava-android'
+        exclude group: 'io.reactivex', module: 'rxandroid'
     }
     compile('com.groundupworks.android:cloud-print:1.0.0') {
         exclude group: 'com.android.support', module: 'support-v4'
         exclude group: 'com.netflix.rxjava', module: 'rxjava-android'
     }
-    compile 'com.netflix.rxjava:rxjava-android:0.20.6'
+
+    // Required by com.groundupworks.android:cloud-print:1.0.0
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.3.0'
+
+    compile 'io.reactivex:rxandroid:0.23.0'
     compile ('com.jayway.jsonpath:json-path:1.2.0') {
         exclude group: 'asm', module: 'asm'
     }

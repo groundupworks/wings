@@ -23,15 +23,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.groundupworks.android.account.activity.AccountSelectionActivityHelper;
 import com.groundupworks.android.auth.GoogleOauthTokenObservable;
 import com.groundupworks.android.auth.activity.OperatorGoogleAuthenticationActivityController;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.groundupworks.android.print.GoogleCloudPrint;
 import com.groundupworks.android.print.jackson.JacksonPrinterSearchResultOperator;
 import com.groundupworks.android.print.jackson.model.JacksonPrinterSearchResult;
@@ -54,8 +53,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import javax.inject.Inject;
 
 import retrofit.client.Response;
 import rx.Observable;
@@ -110,7 +107,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
     static final String EXTRA_COPIES = "copies";
 
     private static final int REQUEST_CODE_BASE = 1000;
-    public static final String DEFAULT_COUNT = "1";
+    public static final int DEFAULT_COPIES = 1;
 
     private final Action1<Throwable> mShowPrinterNotFoundAction = new Action1<Throwable>() {
         @Override
@@ -129,10 +126,12 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
     private String mAccountSelected;
     private String mAuthenticationToken;
 
-    private Button mSelectPrinterButton;
     private Spinner mPrinterSpinner;
+    private Spinner mCopiesSpinner;
     private Spinner mMediaSpinner;
-    private EditText mCountText;
+    private Button mLinkButton;
+
+    private int mCopies = DEFAULT_COPIES;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,8 +142,6 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
         mAccountSelectionHelper = new AccountSelectionActivityHelper(this, REQUEST_CODE_BASE);
         mGoogleCloudPrint = new GoogleCloudPrint();
 
-        mCountText = (EditText) findViewById(R.id.gcp_activity_settings_spinner_copies_text);
-        mSelectPrinterButton = (Button) findViewById(R.id.gcp_activity_settings_button_link);
         mPrinterSpinner = (Spinner) findViewById(R.id.gcp_activity_settings_spinner_printers);
         mPrinterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -154,13 +151,40 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
+                // Do nothing.
+            }
+        });
 
+        mCopiesSpinner = (Spinner) findViewById(R.id.gcp_activity_settings_spinner_copies);
+        final int[] copies = getResources().getIntArray(R.array.wings_gcp__copies);
+        final String[] copiesText = new String[copies.length];
+        for (int i = 0; i < copies.length; i++) {
+            if (copies[i] > 1) {
+                copiesText[i] = getString(R.string.wings_gcp__settings__spinner_copies_text_multi, copies[i]);
+            } else {
+                copiesText[i] = getString(R.string.wings_gcp__settings__spinner_copies_text_single);
+            }
+        }
+        mCopiesSpinner.setAdapter(new ArrayAdapter<>(
+                GoogleCloudPrintSettingsActivity.this, R.layout.gcp_settings_spinner_item,
+                R.id.activity_main_spinner_item_text, copiesText
+        ));
+        mCopiesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                mCopies = copies[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                // Do nothing.
             }
         });
 
         mMediaSpinner = (Spinner) findViewById(R.id.gcp_activity_settings_spinner_media_sizes);
 
-        mSelectPrinterButton.setOnClickListener(new View.OnClickListener() {
+        mLinkButton = (Button) findViewById(R.id.gcp_activity_settings_button_link);
+        mLinkButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
                 final Printer selectedPrinter = (Printer) mPrinterSpinner.getSelectedItem();
@@ -175,14 +199,9 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
                         intent.putExtra(EXTRA_PRINTER_NAME, selectedPrinter.getName());
                         intent.putExtra(EXTRA_ACCOUNT, account);
                         intent.putExtra(EXTRA_TOKEN, token);
+                        intent.putExtra(EXTRA_COPIES, String.valueOf(mCopies));
                         if (selectedMedia != null) {
                             intent.putExtra(EXTRA_MEDIA, selectedMedia.id);
-                        }
-                        final String count = mCountText.getText().toString();
-                        if (!TextUtils.isEmpty(count)) {
-                            intent.putExtra(EXTRA_COPIES, count);
-                        } else {
-                            intent.putExtra(EXTRA_COPIES, DEFAULT_COUNT);
                         }
                         setResult(Activity.RESULT_OK, intent);
                         finish();
@@ -195,7 +214,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
     }
 
     private void onPrinterSelected(final int position) {
-        mMediaSpinner.setVisibility(View.GONE);
+        mMediaSpinner.setVisibility(View.INVISIBLE);
         final Printer printer = (Printer) mPrinterSpinner.getAdapter().getItem(position);
         mOauthObservable.subscribe(new Action1<String>() {
             @Override
@@ -303,7 +322,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
         mLogger.log("gcp_search_printer_success", parameters);
 
         if (printers != null && printers.size() > 0) {
-            mPrinterSpinner.setAdapter(new ArrayAdapter<Printer>(
+            mPrinterSpinner.setAdapter(new ArrayAdapter<>(
                     GoogleCloudPrintSettingsActivity.this, R.layout.gcp_settings_spinner_item,
                     R.id.activity_main_spinner_item_text, printers
             ));
@@ -321,11 +340,11 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
 
             final boolean hasMediaSize = !sizes.isEmpty();
             if (hasMediaSize) {
-                mMediaSpinner.setAdapter(new ArrayAdapter<MediaSize>(
+                mMediaSpinner.setAdapter(new ArrayAdapter<>(
                         GoogleCloudPrintSettingsActivity.this, R.layout.gcp_settings_spinner_item,
                         R.id.activity_main_spinner_item_text, sizes));
             }
-            mMediaSpinner.setVisibility(hasMediaSize ? View.VISIBLE : View.GONE);
+            mMediaSpinner.setVisibility(hasMediaSize ? View.VISIBLE : View.INVISIBLE);
         } else {
             final HashMap<String, String> parameters = new HashMap<>();
             parameters.put("code", String.valueOf(response.getStatus()));

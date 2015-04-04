@@ -62,10 +62,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
             "  \"version\": \"1.0\",\n" +
             "  \"print\": {\n" +
             "    \"vendor_ticket_item\": [],\n" +
-            "    \"color\": {\n" +
-            "      \"type\": \"STANDARD_COLOR\"\n" +
-            "    },\n" +
-            "    \"copies\": {\"copies\": %d}," +
+            "    \"copies\": {\"copies\": %s}," +
             "    \"media_size\": {\n" +
             "      \"width_microns\": 1,\n" +
             "      \"height_microns\": 1,\n" +
@@ -79,10 +76,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
             "  \"version\": \"1.0\",\n" +
             "  \"print\": {\n" +
             "    \"vendor_ticket_item\": [],\n" +
-            "    \"copies\": {\"copies\": %d}," +
-            "    \"color\": {\n" +
-            "      \"type\": \"STANDARD_COLOR\"\n" +
-            "    }\n" +
+            "    \"copies\": {\"copies\": %s}" +
             "  }\n" +
             "}";
 
@@ -222,14 +216,19 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                             try {
                                 final GcpResponse gcpResponse = JsonPath.parse(response.getBody().in())
                                         .read("$", GcpResponse.class);
-                                parameters.put("message", gcpResponse.message);
-                                if (gcpResponse.hasSucceeded) {
-                                    mDatabase.markSuccessful(shareRequest.getId());
-                                    shareCount++;
-                                    sLogger.log("gcp_queue_success", parameters);
+                                if (gcpResponse != null) {
+                                    parameters.put("message", gcpResponse.message);
+                                    if (gcpResponse.hasSucceeded) {
+                                        mDatabase.markSuccessful(shareRequest.getId());
+                                        shareCount++;
+                                        sLogger.log("gcp_queue_success", parameters);
+                                    } else {
+                                        mDatabase.markFailed(shareRequest.getId());
+                                        sLogger.log("gcp_queue_failed", parameters);
+                                    }
                                 } else {
                                     mDatabase.markFailed(shareRequest.getId());
-                                    sLogger.log("gcp_queue_failed", parameters);
+                                    sLogger.log("gcp_response_parsing_failed", parameters);
                                 }
                             } catch (IOException e) {
                                 mDatabase.markFailed(shareRequest.getId());

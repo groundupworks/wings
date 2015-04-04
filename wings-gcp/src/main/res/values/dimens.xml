@@ -1,5 +1,0 @@
-<resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="wings_gcp__activity_horizontal_margin">16dp</dimen>
-    <dimen name="wings_gcp__activity_vertical_margin">16dp</dimen>
-</resources>

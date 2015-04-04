@@ -9,9 +9,9 @@
 
     <!-- GCP Settings Activity -->
     <string name="wings_gcp__settings__label">Select printer</string>
+    <string name="wings_gcp__settings__spinner_copies_text_single">Single copy</string>
+    <string name="wings_gcp__settings__spinner_copies_text_multi">%1$d copies</string>
     <string name="wings_gcp__settings__button_link_text">Link</string>
     <string name="wings_gcp__settings__error_authenticate">Unable to authenticate</string>
     <string name="wings_gcp__settings__error_no_printer">No printer available</string>
-    <string name="wings_gcp__settings__copies_text"># copies</string>
-    <string name="gcp_activity_settings_spinner_copies_text_default">1</string>
 </resources>
