@@ -103,8 +103,11 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
     static final String EXTRA_PRINTER = "printer";
     static final String EXTRA_PRINTER_NAME = "printer_name";
     static final String EXTRA_TOKEN = "token";
-    static final String EXTRA_MEDIA = "media";
     static final String EXTRA_COPIES = "copies";
+    static final String EXTRA_MEDIA_VENDOR_ID = "media_vendor_id";
+    static final String EXTRA_MEDIA_WIDTH_MICRONS = "media_width_microns";
+    static final String EXTRA_MEDIA_HEIGHT_MICRONS = "media_height_microns";
+    static final String EXTRA_MEDIA_IS_CONTINUOUS_FEED = "media_is_continuous_feed";
 
     private static final int REQUEST_CODE_BASE = 1000;
     public static final int DEFAULT_COPIES = 1;
@@ -201,7 +204,10 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
                         intent.putExtra(EXTRA_TOKEN, token);
                         intent.putExtra(EXTRA_COPIES, String.valueOf(mCopies));
                         if (selectedMedia != null) {
-                            intent.putExtra(EXTRA_MEDIA, selectedMedia.id);
+                            intent.putExtra(EXTRA_MEDIA_VENDOR_ID, selectedMedia.vendor_id);
+                            intent.putExtra(EXTRA_MEDIA_WIDTH_MICRONS, String.valueOf(selectedMedia.width_microns));
+                            intent.putExtra(EXTRA_MEDIA_HEIGHT_MICRONS, String.valueOf(selectedMedia.height_microns));
+                            intent.putExtra(EXTRA_MEDIA_IS_CONTINUOUS_FEED, String.valueOf(selectedMedia.is_continuous_feed));
                         }
                         setResult(Activity.RESULT_OK, intent);
                         finish();
@@ -370,14 +376,23 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
     static class MediaSize {
 
         @JsonProperty("custom_display_name")
-        String name;
+        String custom_display_name;
 
         @JsonProperty("vendor_id")
-        String id;
+        String vendor_id;
+
+        @JsonProperty("width_microns")
+        int width_microns;
+
+        @JsonProperty("height_microns")
+        int height_microns;
+
+        @JsonProperty("is_continuous_feed")
+        boolean is_continuous_feed;
 
         @Override
         public String toString() {
-            return name;
+            return custom_display_name;
         }
     }
 }

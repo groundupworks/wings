@@ -46,7 +46,10 @@ import retrofit.mime.TypedFile;
 
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_ACCOUNT;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_COPIES;
-import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_MEDIA;
+import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_MEDIA_HEIGHT_MICRONS;
+import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_MEDIA_IS_CONTINUOUS_FEED;
+import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_MEDIA_VENDOR_ID;
+import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_MEDIA_WIDTH_MICRONS;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_PRINTER;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_PRINTER_NAME;
 import static com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity.EXTRA_TOKEN;
@@ -62,12 +65,12 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
             "  \"version\": \"1.0\",\n" +
             "  \"print\": {\n" +
             "    \"vendor_ticket_item\": [],\n" +
-            "    \"copies\": {\"copies\": %s}," +
+            "    \"copies\": {\"copies\": %s},\n" +
             "    \"media_size\": {\n" +
-            "      \"width_microns\": 1,\n" +
-            "      \"height_microns\": 1,\n" +
-            "      \"is_continuous_feed\": false,\n" +
-            "      \"vendor_id\" : \"%s\"\n" +
+            "      \"vendor_id\" : \"%s\",\n" +
+            "      \"width_microns\": %s,\n" +
+            "      \"height_microns\": %s,\n" +
+            "      \"is_continuous_feed\": %s,\n" +
             "    }\n" +
             "  }\n" +
             "}";
@@ -76,7 +79,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
             "  \"version\": \"1.0\",\n" +
             "  \"print\": {\n" +
             "    \"vendor_ticket_item\": [],\n" +
-            "    \"copies\": {\"copies\": %s}" +
+            "    \"copies\": {\"copies\": %s}\n" +
             "  }\n" +
             "}";
 
@@ -111,9 +114,12 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         editor.putBoolean(mContext.getString(R.string.wings_gcp__link_key), false);
         editor.remove(mContext.getString(R.string.wings_gcp__account_name_key));
         editor.remove(mContext.getString(R.string.wings_gcp__printer_identifier_key));
-        editor.remove(mContext.getString(R.string.wings_gcp__media));
         editor.remove(mContext.getString(R.string.wings_gcp__token));
         editor.remove(mContext.getString(R.string.wings_gcp__copies));
+        editor.remove(mContext.getString(R.string.wings_gcp__media_vendor_id));
+        editor.remove(mContext.getString(R.string.wings_gcp__media_width_microns));
+        editor.remove(mContext.getString(R.string.wings_gcp__media_height_microns));
+        editor.remove(mContext.getString(R.string.wings_gcp__media_is_continuous_feed));
         editor.apply();
 
         // Emit link state change event.
@@ -148,9 +154,12 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                 String accountName = data.getStringExtra(EXTRA_ACCOUNT);
                 String printerIdentifier = data.getStringExtra(EXTRA_PRINTER);
                 String printerName = data.getStringExtra(EXTRA_PRINTER_NAME);
-                String media = data.getStringExtra(EXTRA_MEDIA);
                 String token = data.getStringExtra(EXTRA_TOKEN);
                 String copies = data.getStringExtra(EXTRA_COPIES);
+                String mediaVendorId = data.getStringExtra(EXTRA_MEDIA_VENDOR_ID);
+                String mediaWidthMicrons = data.getStringExtra(EXTRA_MEDIA_WIDTH_MICRONS);
+                String mediaHeightMicrons = data.getStringExtra(EXTRA_MEDIA_HEIGHT_MICRONS);
+                String mediaIsContinuousFeed = data.getStringExtra(EXTRA_MEDIA_IS_CONTINUOUS_FEED);
 
                 if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier) && !TextUtils.isEmpty(token)) {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
@@ -158,9 +167,12 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                     editor.putString(mContext.getString(R.string.wings_gcp__account_name_key), accountName);
                     editor.putString(mContext.getString(R.string.wings_gcp__printer_identifier_key), printerIdentifier);
                     editor.putString(mContext.getString(R.string.wings_gcp__printer_name_key), printerName);
-                    editor.putString(mContext.getString(R.string.wings_gcp__media), media);
                     editor.putString(mContext.getString(R.string.wings_gcp__token), token);
                     editor.putString(mContext.getString(R.string.wings_gcp__copies), copies);
+                    editor.putString(mContext.getString(R.string.wings_gcp__media_vendor_id), mediaVendorId);
+                    editor.putString(mContext.getString(R.string.wings_gcp__media_width_microns), mediaWidthMicrons);
+                    editor.putString(mContext.getString(R.string.wings_gcp__media_height_microns), mediaHeightMicrons);
+                    editor.putString(mContext.getString(R.string.wings_gcp__media_is_continuous_feed), mediaIsContinuousFeed);
                     editor.apply();
 
                     // Emit link state change event.
@@ -197,12 +209,17 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         final boolean isLinked = preferences.getBoolean(mContext.getString(R.string.wings_gcp__link_key), false);
         final String accountName = preferences.getString(mContext.getString(R.string.wings_gcp__account_name_key), null);
         final String printerIdentifier = preferences.getString(mContext.getString(R.string.wings_gcp__printer_identifier_key), null);
-        final String media = preferences.getString(mContext.getString(R.string.wings_gcp__media), null);
         final String token = preferences.getString(mContext.getString(R.string.wings_gcp__token), null);
         final String copies = preferences.getString(mContext.getString(R.string.wings_gcp__copies), null);
+        final String mediaVendorId = preferences.getString(mContext.getString(R.string.wings_gcp__media_vendor_id), null);
+        final String mediaWidthMicrons = preferences.getString(mContext.getString(R.string.wings_gcp__media_width_microns), null);
+        final String mediaHeightMicrons = preferences.getString(mContext.getString(R.string.wings_gcp__media_height_microns), null);
+        final String mediaIsContinuousFeed = preferences.getString(mContext.getString(R.string.wings_gcp__media_is_continuous_feed), null);
         if (isLinked && !TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(printerIdentifier) &&
                 !TextUtils.isEmpty(token)) {
-            final String ticket = !TextUtils.isEmpty(media) ? String.format(TICKET_WITH_MEDIA, copies, media) : String.format(TICKET, copies);
+            final String ticket = !TextUtils.isEmpty(mediaVendorId)
+                    ? String.format(TICKET_WITH_MEDIA, copies, mediaVendorId, mediaWidthMicrons, mediaHeightMicrons, mediaIsContinuousFeed)
+                    : String.format(TICKET, copies);
             final Destination destination = new Destination(DestinationId.PRINT_QUEUE, ENDPOINT_ID);
             List<ShareRequest> shareRequests = mDatabase.checkoutShareRequests(destination);
             for (ShareRequest shareRequest : shareRequests) {
