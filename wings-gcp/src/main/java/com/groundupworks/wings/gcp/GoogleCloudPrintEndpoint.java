@@ -62,9 +62,6 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
             "  \"version\": \"1.0\",\n" +
             "  \"print\": {\n" +
             "    \"vendor_ticket_item\": [],\n" +
-            "    \"color\": {\n" +
-            "      \"type\": \"STANDARD_COLOR\"\n" +
-            "    },\n" +
             "    \"copies\": {\"copies\": %s}," +
             "    \"media_size\": {\n" +
             "      \"width_microns\": 1,\n" +
@@ -79,10 +76,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
             "  \"version\": \"1.0\",\n" +
             "  \"print\": {\n" +
             "    \"vendor_ticket_item\": [],\n" +
-            "    \"copies\": {\"copies\": %s}," +
-            "    \"color\": {\n" +
-            "      \"type\": \"STANDARD_COLOR\"\n" +
-            "    }\n" +
+            "    \"copies\": {\"copies\": %s}" +
             "  }\n" +
             "}";
 
