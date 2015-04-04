@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/wings_gcp__activity_horizontal_margin"
+    android:padding="12dip"
     tools:context="com.groundupworks.wings.gcp.GoogleCloudPrintSettingsActivity">
 
     <Spinner
@@ -12,35 +12,20 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
+    <Spinner
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/wings_gcp__settings__copies_text"
         android:id="@+id/gcp_activity_settings_spinner_copies"
-        android:layout_below="@+id/gcp_activity_settings_spinner_printers"
-        android:layout_alignLeft="@+id/gcp_activity_settings_spinner_printers"
-        android:layout_alignStart="@+id/gcp_activity_settings_spinner_printers" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
-        android:id="@+id/gcp_activity_settings_spinner_copies_text"
-        android:layout_below="@+id/gcp_activity_settings_spinner_printers"
-        android:layout_alignRight="@+id/gcp_activity_settings_spinner_copies"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:text="@string/gcp_activity_settings_spinner_copies_text_default"/>
+        android:layout_below="@id/gcp_activity_settings_spinner_printers"
+        android:layout_centerHorizontal="true" />
 
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/gcp_activity_settings_spinner_media_sizes"
-        android:layout_below="@id/gcp_activity_settings_spinner_copies_text"
+        android:layout_below="@id/gcp_activity_settings_spinner_copies"
         android:layout_centerHorizontal="true"
-        android:visibility="gone"/>
+        android:visibility="invisible" />
 
     <Button
         android:layout_width="match_parent"
@@ -48,5 +33,4 @@
         android:layout_below="@id/gcp_activity_settings_spinner_media_sizes"
         android:text="@string/wings_gcp__settings__button_link_text"
         android:id="@+id/gcp_activity_settings_button_link" />
-
 </RelativeLayout>

@@ -222,14 +222,19 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
                             try {
                                 final GcpResponse gcpResponse = JsonPath.parse(response.getBody().in())
                                         .read("$", GcpResponse.class);
-                                parameters.put("message", gcpResponse.message);
-                                if (gcpResponse.hasSucceeded) {
-                                    mDatabase.markSuccessful(shareRequest.getId());
-                                    shareCount++;
-                                    sLogger.log("gcp_queue_success", parameters);
+                                if (gcpResponse != null) {
+                                    parameters.put("message", gcpResponse.message);
+                                    if (gcpResponse.hasSucceeded) {
+                                        mDatabase.markSuccessful(shareRequest.getId());
+                                        shareCount++;
+                                        sLogger.log("gcp_queue_success", parameters);
+                                    } else {
+                                        mDatabase.markFailed(shareRequest.getId());
+                                        sLogger.log("gcp_queue_failed", parameters);
+                                    }
                                 } else {
                                     mDatabase.markFailed(shareRequest.getId());
-                                    sLogger.log("gcp_queue_failed", parameters);
+                                    sLogger.log("gcp_response_parsing_failed", parameters);
                                 }
                             } catch (IOException e) {
                                 mDatabase.markFailed(shareRequest.getId());
