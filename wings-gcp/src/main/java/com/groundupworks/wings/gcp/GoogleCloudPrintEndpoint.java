@@ -331,7 +331,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         /**
          * The GCP print queue.
          */
-        public static final int PRINT_QUEUE = 0;
+        int PRINT_QUEUE = 0;
     }
 
     /**

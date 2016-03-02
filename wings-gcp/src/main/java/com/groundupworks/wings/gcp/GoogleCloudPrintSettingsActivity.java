@@ -112,6 +112,13 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
     private static final int REQUEST_CODE_BASE = 1000;
     public static final int DEFAULT_COPIES = 1;
 
+    private final Action1<Throwable> mAuthErrorAction = new Action1<Throwable>() {
+        @Override
+        public void call(final Throwable throwable) {
+            // Do nothing.
+        }
+    };
+
     private final Action1<Throwable> mShowPrinterNotFoundAction = new Action1<Throwable>() {
         @Override
         public void call(final Throwable throwable) {
@@ -232,7 +239,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
                     }
                 }, mShowPrinterNotFoundAction);
             }
-        });
+        }, mAuthErrorAction);
     }
 
     @Override
@@ -304,7 +311,7 @@ public class GoogleCloudPrintSettingsActivity extends Activity implements
                     }
                 }, mShowPrinterNotFoundAction);
             }
-        });
+        }, mAuthErrorAction);
     }
 
     private Observable<JacksonPrinterSearchResult> searchPrinters(final String token) {
