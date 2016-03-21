@@ -3,7 +3,7 @@ Wings
 
 [![Build Status](http://img.shields.io/travis/groundupworks/wings.svg?style=flat-square)](https://travis-ci.org/groundupworks/wings)
 [![License](http://img.shields.io/:license-apache-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
-[![Maven Central](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven.svg?style=flat-square)]()
+[![Maven Central](https://img.shields.io/maven-central/v/com.groundupworks.wings/wings.svg?style=flat-square)]()
 
 Wings is an Android library for silently sharing photos to an extensible set of endpoints. The currently supported endpoints include:
 
