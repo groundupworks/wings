@@ -1,0 +1,7 @@
+digraph G1 {
+  concentrate = true;
+  n2 [label="android.content.Context"];
+  WingsDbHelper -> n2;
+  WingsService -> WingsDbHelper;
+  WingsService -> n2;
+}

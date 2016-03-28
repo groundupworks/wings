@@ -1,0 +1,2 @@
+int drawable wings__notification 0x7f020000
+int string wings__retry_policy_consecutive_fails 0x7f030000

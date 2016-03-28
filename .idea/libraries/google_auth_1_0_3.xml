@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="google-auth-1.0.3">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/wings-gcp/build/intermediates/exploded-aar/com.groundupworks.android/google-auth/1.0.3/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/wings-gcp/build/intermediates/exploded-aar/com.groundupworks.android/google-auth/1.0.3/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.groundupworks.android/google-auth/1.0.3/d3566ad911524b0cf9831b230a6b0887a6608cf1/google-auth-1.0.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

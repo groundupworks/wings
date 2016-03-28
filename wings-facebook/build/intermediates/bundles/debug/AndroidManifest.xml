@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.groundupworks.wings.facebook"
+    android:versionName="1.0.4" >
+
+    <uses-sdk
+        android:minSdkVersion="10"
+        android:targetSdkVersion="22" />
+
+    <application android:allowBackup="true" >
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/wings_facebook__app_id" />
+
+        <activity
+            android:name="com.facebook.LoginActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name="com.groundupworks.wings.facebook.FacebookLoginActivity"
+            android:label="@string/wings_facebook__login__label" />
+        <activity
+            android:name="com.groundupworks.wings.facebook.FacebookSettingsActivity"
+            android:label="@string/wings_facebook__settings__label" />
+    </application>
+
+</manifest>

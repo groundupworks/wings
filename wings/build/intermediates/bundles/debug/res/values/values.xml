@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From: file:/Users/benedict/Dev/projects/github/wings/wings/src/main/res/values/donottranslate.xml -->
+    <eat-comment/>
+    <string name="wings__retry_policy_consecutive_fails">wings__retry_policy_consecutive_fails</string>
+</resources>
