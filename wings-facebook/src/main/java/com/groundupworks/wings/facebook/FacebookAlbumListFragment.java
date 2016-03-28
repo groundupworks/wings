@@ -37,6 +37,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * {@link Fragment} for Facebook photo album selection.
@@ -167,8 +169,8 @@ public class FacebookAlbumListFragment extends ListFragment {
     }
 
     /**
-     * Asynchronously requests the Page accounts associated with the linked account. Calls
-     * {@link #requestAlbums(java.util.List)} when completed.
+     * Asynchronously requests the Page accounts associated with the linked account.  Calls
+     * {@link #requestPageAlbums(Queue, List)} when completed.
      */
     private void requestAccounts() {
         Callback callback = new Callback() {
@@ -180,7 +182,8 @@ public class FacebookAlbumListFragment extends ListFragment {
                 }
 
                 if (response != null && response.getError() == null) {
-                    List<Object[]> pageAlbums = new ArrayList<Object[]>();
+                    Queue<PageAccount> pageAccounts = new LinkedBlockingQueue<>();
+                    List<Object[]> pageAlbums = new ArrayList<>();
 
                     GraphObject graphObject = response.getGraphObject();
                     if (graphObject != null) {
@@ -192,18 +195,22 @@ public class FacebookAlbumListFragment extends ListFragment {
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 try {
                                     // Get data from json.
-                                    JSONObject album = jsonArray.getJSONObject(i);
-                                    String id = album.getString(FacebookEndpoint.ACCOUNTS_LISTING_FIELD_ID);
-                                    String name = album.getString(FacebookEndpoint.ACCOUNTS_LISTING_FIELD_NAME);
-                                    String pageAccessToken = album.getString(FacebookEndpoint.ACCOUNTS_LISTING_FIELD_ACCESS_TOKEN);
-                                    JSONArray perms = album.getJSONArray(FacebookEndpoint.ACCOUNTS_LISTING_FIELD_PERMS);
+                                    JSONObject account = jsonArray.getJSONObject(i);
+                                    String id = account.getString(FacebookEndpoint.ACCOUNTS_LISTING_FIELD_ID);
+                                    String name = account.getString(FacebookEndpoint.ACCOUNTS_LISTING_FIELD_NAME);
+                                    String pageAccessToken = account.getString(FacebookEndpoint.ACCOUNTS_LISTING_FIELD_ACCESS_TOKEN);
+                                    JSONArray perms = account.getJSONArray(FacebookEndpoint.ACCOUNTS_LISTING_FIELD_PERMS);
 
                                     // Add Page albums with content creation permission.
                                     for (int j = 0; j < perms.length(); j++) {
                                         if (FacebookEndpoint.ACCOUNT_PERM_CREATE_CONTENT.equals(perms.optString(j))) {
                                             if (id != null && id.length() > 0 && name != null && name.length() > 0
                                                     && pageAccessToken != null && pageAccessToken.length() > 0) {
-                                                String graphPath = id + FacebookEndpoint.PAGE_ID_TO_GRAPH_PATH;
+                                                // Add Page account to queue.
+                                                pageAccounts.add(new PageAccount(id, name, pageAccessToken));
+
+                                                // Add Page wall album to Page albums.
+                                                String graphPath = id + FacebookEndpoint.TO_PAGE_WALL_GRAPH_PATH;
                                                 pageAlbums.add(new Object[]{cursorId, FacebookEndpoint.DestinationId.PAGE,
                                                         name, graphPath, FacebookEndpoint.PAGE_PRIVACY, pageAccessToken});
                                                 cursorId++;
@@ -220,8 +227,8 @@ public class FacebookAlbumListFragment extends ListFragment {
                         }
                     }
 
-                    // Request for albums.
-                    requestAlbums(pageAlbums);
+                    // Request for Profile albums.
+                    requestPageAlbums(pageAccounts, pageAlbums);
                 } else {
                     // Finish Activity with error.
                     activity.mHasErrorOccurred = true;
@@ -234,12 +241,85 @@ public class FacebookAlbumListFragment extends ListFragment {
     }
 
     /**
+     * Asynchronously and recursively requests the albums associated with each {@link PageAccount}.
+     * Calls {@link #requestProfileAlbums(java.util.List)} when all Page album listings are completed.
+     *
+     * @param pageAccounts a list of Page accounts to recursively list albums for.
+     * @param pageAlbums   a list of Page albums to append to.
+     */
+    private void requestPageAlbums(final Queue<PageAccount> pageAccounts, final List<Object[]> pageAlbums) {
+        final PageAccount account = pageAccounts.poll();
+        if (account != null) {
+            Callback callback = new Callback() {
+                @Override
+                public void onCompleted(Response response) {
+                    FacebookSettingsActivity activity = (FacebookSettingsActivity) getActivity();
+                    if (activity == null || activity.isFinishing()) {
+                        return;
+                    }
+
+                    if (response != null && response.getError() == null) {
+                        GraphObject graphObject = response.getGraphObject();
+                        if (graphObject != null) {
+                            JSONObject jsonObject = graphObject.getInnerJSONObject();
+                            try {
+                                JSONArray jsonArray = jsonObject
+                                        .getJSONArray(FacebookEndpoint.ALBUMS_LISTING_RESULT_DATA_KEY);
+                                long cursorId = 1L + pageAlbums.size();
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    try {
+                                        // Get data from json.
+                                        JSONObject album = jsonArray.getJSONObject(i);
+                                        String id = album.getString(FacebookEndpoint.ALBUMS_LISTING_FIELD_ID);
+                                        String name = album.getString(FacebookEndpoint.ALBUMS_LISTING_FIELD_NAME);
+                                        String type = album.getString(FacebookEndpoint.ALBUMS_LISTING_FIELD_TYPE);
+                                        String privacy = album.getString(FacebookEndpoint.ALBUMS_LISTING_FIELD_PRIVACY);
+                                        boolean canUpload = album
+                                                .getBoolean(FacebookEndpoint.ALBUMS_LISTING_FIELD_CAN_UPLOAD);
+
+                                        // Filter out albums that do not allow upload.
+                                        if (canUpload && id != null && id.length() > 0 && name != null && name.length() > 0
+                                                && type != null && type.length() > 0 && privacy != null
+                                                && privacy.length() > 0) {
+                                            String graphPath = id + FacebookEndpoint.TO_UPLOAD_PHOTOS_GRAPH_PATH;
+                                            pageAlbums.add(new Object[]{cursorId, FacebookEndpoint.DestinationId.PAGE_ALBUM,
+                                                    activity.getString(R.string.wings_facebook__destination_page_album_name_template, account.mName, name),
+                                                    graphPath, privacy, account.mPageAccessToken});
+                                            cursorId++;
+                                        }
+                                    } catch (JSONException e) {
+                                        // Do nothing.
+                                    }
+                                }
+
+                                // Handle next Page account.
+                                requestPageAlbums(pageAccounts, pageAlbums);
+                            } catch (JSONException e) {
+                                // Do nothing.
+                            }
+                        }
+                    } else {
+                        // Finish Activity with error.
+                        activity.mHasErrorOccurred = true;
+                        activity.tryFinish();
+                    }
+                }
+            };
+
+            mFacebookEndpoint.requestAlbums(account.mId, callback);
+        } else {
+            // Exit recursively calls and move on to requesting Profile albums.
+            requestProfileAlbums(pageAlbums);
+        }
+    }
+
+    /**
      * Asynchronously requests the albums associated with the linked account. Sets the {@link ListAdapter} when
      * completed.
      *
-     * @param pageAlbums a list of page albums associated with Page accounts.
+     * @param pageAlbums a list of Page albums to include in the {@link ListAdapter}.
      */
-    private void requestAlbums(final List<Object[]> pageAlbums) {
+    private void requestProfileAlbums(final List<Object[]> pageAlbums) {
         Callback callback = new Callback() {
             @Override
             public void onCompleted(Response response) {
@@ -274,7 +354,7 @@ public class FacebookAlbumListFragment extends ListFragment {
                                     if (canUpload && id != null && id.length() > 0 && name != null && name.length() > 0
                                             && type != null && type.length() > 0 && privacy != null
                                             && privacy.length() > 0) {
-                                        String graphPath = id + FacebookEndpoint.ALBUM_ID_TO_GRAPH_PATH;
+                                        String graphPath = id + FacebookEndpoint.TO_UPLOAD_PHOTOS_GRAPH_PATH;
                                         if (FacebookEndpoint.DEFAULT_ALBUM_TYPE.equals(type)) {
                                             appAlbum = new Object[]{APP_ALBUM_CURSOR_ID, FacebookEndpoint.DestinationId.PROFILE,
                                                     name, graphPath, FacebookEndpoint.APP_ALBUM_PRIVACY, null};
@@ -323,7 +403,7 @@ public class FacebookAlbumListFragment extends ListFragment {
             }
         };
 
-        mFacebookEndpoint.requestAlbums(callback);
+        mFacebookEndpoint.requestAlbums(FacebookEndpoint.ME, callback);
     }
 
     //
@@ -337,5 +417,34 @@ public class FacebookAlbumListFragment extends ListFragment {
      */
     public static FacebookAlbumListFragment newInstance() {
         return new FacebookAlbumListFragment();
+    }
+
+    //
+    // Private classes.
+    //
+
+    /**
+     * An account that represents a Facebook Page.
+     */
+    private static final class PageAccount {
+
+        private final String mId;
+
+        private final String mName;
+
+        private final String mPageAccessToken;
+
+        /**
+         * Private constructor.
+         *
+         * @param id          the Page id.
+         * @param name        the Page name.
+         * @param accessToken the Page access token.
+         */
+        private PageAccount(String id, String name, String accessToken) {
+            mId = id;
+            mName = name;
+            mPageAccessToken = accessToken;
+        }
     }
 }

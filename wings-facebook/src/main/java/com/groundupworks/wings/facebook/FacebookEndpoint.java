@@ -170,18 +170,23 @@ public class FacebookEndpoint extends WingsEndpoint {
     static final String ACCOUNT_PERM_CREATE_CONTENT = "CREATE_CONTENT";
 
     /**
-     * The {@link String} to append to Page id to create graph path.
+     * The sub-path to append to an id to upload photos.
      */
-    static final String PAGE_ID_TO_GRAPH_PATH = "/photos";
+    static final String TO_UPLOAD_PHOTOS_GRAPH_PATH = "/photos";
+
+    /**
+     * The sub-path to append to Page id to create graph path to Page wall.
+     */
+    static final String TO_PAGE_WALL_GRAPH_PATH = TO_UPLOAD_PHOTOS_GRAPH_PATH;
 
     //
     // Albums listing params.
     //
 
     /**
-     * The graph path to list photo albums.
+     * The sub-path to append to {@link #ME} or Page id to list albums.
      */
-    private static final String ALBUMS_LISTING_GRAPH_PATH = "me/albums";
+    private static final String TO_ALBUMS_LISTING_GRAPH_PATH = "/albums";
 
     /**
      * The key for max number of albums to request.
@@ -219,19 +224,19 @@ public class FacebookEndpoint extends WingsEndpoint {
 
     static final String ALBUMS_LISTING_FIELD_CAN_UPLOAD = "can_upload";
 
-    /**
-     * The {@link String} to append to album id to create graph path.
-     */
-    static final String ALBUM_ID_TO_GRAPH_PATH = "/photos";
-
     //
     // Default album params.
     //
 
     /**
+     * The Profile graph node.
+     */
+    static final String ME = "me";
+
+    /**
      * The graph path of the app album.
      */
-    static final String APP_ALBUM_GRAPH_PATH = "me/photos";
+    static final String APP_ALBUM_GRAPH_PATH = ME + TO_UPLOAD_PHOTOS_GRAPH_PATH;
 
     /**
      * The privacy level of the Page album.
@@ -688,10 +693,11 @@ public class FacebookEndpoint extends WingsEndpoint {
     /**
      * Asynchronously requests the albums associated with the linked account. Requires an opened active {@link Session}.
      *
+     * @param id       may be {@link #ME} or a Page id.
      * @param callback a {@link Callback} when the request completes.
      * @return true if the request is made; false if no opened {@link Session} is active.
      */
-    boolean requestAlbums(Callback callback) {
+    boolean requestAlbums(String id, Callback callback) {
         boolean isSuccessful = false;
 
         Session session = Session.getActiveSession();
@@ -702,7 +708,7 @@ public class FacebookEndpoint extends WingsEndpoint {
             params.putString(ALBUMS_LISTING_FEILDS_KEY, ALBUMS_LISTING_FIELDS_VALUE);
 
             // Construct and execute albums listing request.
-            Request request = new Request(session, ALBUMS_LISTING_GRAPH_PATH, params, HttpMethod.GET, callback);
+            Request request = new Request(session, id + TO_ALBUMS_LISTING_GRAPH_PATH, params, HttpMethod.GET, callback);
             request.executeAsync();
 
             isSuccessful = true;
@@ -752,6 +758,7 @@ public class FacebookEndpoint extends WingsEndpoint {
             public void run() {
                 mDatabase.deleteShareRequests(new Destination(DestinationId.PROFILE, ENDPOINT_ID));
                 mDatabase.deleteShareRequests(new Destination(DestinationId.PAGE, ENDPOINT_ID));
+                mDatabase.deleteShareRequests(new Destination(DestinationId.PAGE_ALBUM, ENDPOINT_ID));
             }
         });
     }
@@ -844,13 +851,23 @@ public class FacebookEndpoint extends WingsEndpoint {
         if (settings != null) {
             int destinationId = settings.getDestinationId();
             String accountName = settings.getAccountName();
-
-            int resId = R.string.wings_facebook__destination_profile_description;
-            if (DestinationId.PAGE == destinationId) {
-                resId = R.string.wings_facebook__destination_page_description;
+            String destinationDescription;
+            switch (destinationId) {
+                case DestinationId.PROFILE:
+                    destinationDescription = mContext.getString(R.string.wings_facebook__destination_profile_description,
+                            accountName, settings.getAlbumName());
+                    break;
+                case DestinationId.PAGE:
+                    destinationDescription = mContext.getString(R.string.wings_facebook__destination_page_description,
+                            settings.getAlbumName());
+                    break;
+                case DestinationId.PAGE_ALBUM:
+                    destinationDescription = mContext.getString(R.string.wings_facebook__destination_page_album_description,
+                            settings.getAlbumName());
+                    break;
+                default:
+                    return null;
             }
-            String destinationDescription = mContext.getString(resId, accountName, settings.getAlbumName());
-
             return new LinkInfo(accountName, destinationId, destinationDescription);
         }
         return null;
@@ -885,7 +902,8 @@ public class FacebookEndpoint extends WingsEndpoint {
                             params.putParcelable(SHARE_KEY_PICTURE, fileDescriptor);
 
                             String pageAccessToken = settings.optPageAccessToken();
-                            if (DestinationId.PAGE == destinationId && !TextUtils.isEmpty(pageAccessToken)) {
+                            if ((DestinationId.PAGE == destinationId || DestinationId.PAGE_ALBUM == destinationId)
+                                    && !TextUtils.isEmpty(pageAccessToken)) {
                                 params.putString(SHARE_KEY_PAGE_ACCESS_TOKEN, pageAccessToken);
                             }
 
@@ -987,18 +1005,23 @@ public class FacebookEndpoint extends WingsEndpoint {
         /**
          * The personal Facebook profile.
          */
-        public static final int PROFILE = 0;
+        int PROFILE = 0;
 
         /**
          * A Facebook Page.
          */
-        public static final int PAGE = 1;
+        int PAGE = 1;
+
+        /**
+         * A Facebook Page album.
+         */
+        int PAGE_ALBUM = 2;
     }
 
     /**
      * The link event implementation associated with this endpoint.
      */
-    public class LinkEvent extends WingsEndpoint.LinkEvent {
+    public static class LinkEvent extends WingsEndpoint.LinkEvent {
 
         /**
          * Private constructor.

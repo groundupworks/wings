@@ -99,7 +99,8 @@ public class FacebookSettings {
         if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(albumName) && !TextUtils.isEmpty(albumGraphPath)) {
             if (destinationId == FacebookEndpoint.DestinationId.PROFILE) {
                 settings = new FacebookSettings(destinationId, accountName, albumName, albumGraphPath, pageAccessToken, photoPrivacy);
-            } else if (destinationId == FacebookEndpoint.DestinationId.PAGE && !TextUtils.isEmpty(pageAccessToken)) {
+            } else if ((destinationId == FacebookEndpoint.DestinationId.PAGE || destinationId == FacebookEndpoint.DestinationId.PAGE_ALBUM)
+                    && !TextUtils.isEmpty(pageAccessToken)) {
                 settings = new FacebookSettings(destinationId, accountName, albumName, albumGraphPath, pageAccessToken, photoPrivacy);
             }
         }
@@ -126,7 +127,8 @@ public class FacebookSettings {
         if (!TextUtils.isEmpty(accountName) && !TextUtils.isEmpty(albumName) && !TextUtils.isEmpty(albumGraphPath)) {
             if (destinationId == FacebookEndpoint.DestinationId.PROFILE) {
                 settings = new FacebookSettings(destinationId, accountName, albumName, albumGraphPath, pageAccessToken, photoPrivacy);
-            } else if (destinationId == FacebookEndpoint.DestinationId.PAGE && !TextUtils.isEmpty(pageAccessToken)) {
+            } else if ((destinationId == FacebookEndpoint.DestinationId.PAGE || destinationId == FacebookEndpoint.DestinationId.PAGE_ALBUM)
+                    && !TextUtils.isEmpty(pageAccessToken)) {
                 settings = new FacebookSettings(destinationId, accountName, albumName, albumGraphPath, pageAccessToken, photoPrivacy);
             }
         }

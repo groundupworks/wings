@@ -337,7 +337,7 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
     /**
      * The link event implementation associated with this endpoint.
      */
-    public class LinkEvent extends WingsEndpoint.LinkEvent {
+    public static class LinkEvent extends WingsEndpoint.LinkEvent {
 
         /**
          * Private constructor.
