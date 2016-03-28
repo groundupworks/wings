@@ -1,7 +1,0 @@
--classpath '/Users/benedict/Library/Android/sdk/platforms/android-22/android.jar'
--d '/Users/benedict/Dev/projects/github/wings/wings-gcp/build/docs/javadoc'
--doctitle 'wings-gcp 1.0.4 API'
--quiet 
--windowtitle 'wings-gcp 1.0.4 API'
-'/Users/benedict/Dev/projects/github/wings/wings-gcp/src/main/java/com/groundupworks/wings/gcp/GoogleCloudPrintEndpoint.java'
-'/Users/benedict/Dev/projects/github/wings/wings-gcp/src/main/java/com/groundupworks/wings/gcp/GoogleCloudPrintSettingsActivity.java'

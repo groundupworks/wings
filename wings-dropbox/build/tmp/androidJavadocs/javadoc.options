@@ -1,7 +1,0 @@
--classpath '/Users/benedict/Library/Android/sdk/platforms/android-22/android.jar'
--d '/Users/benedict/Dev/projects/github/wings/wings-dropbox/build/docs/javadoc'
--doctitle 'wings-dropbox 1.0.4 API'
--quiet 
--windowtitle 'wings-dropbox 1.0.4 API'
-'/Users/benedict/Dev/projects/github/wings/wings-dropbox/src/main/java/com/groundupworks/wings/dropbox/DropboxEndpoint.java'
-'/Users/benedict/Dev/projects/github/wings/wings-dropbox/src/main/java/com/groundupworks/wings/dropbox/DropboxShareNotification.java'
