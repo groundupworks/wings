@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
     <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -44,18 +44,18 @@
 <p>Wings started off as a component in <a href="https://play.google.com/store/apps/details?id=com.groundupworks.flyingphotobooth">Flying PhotoBooth</a> and <a href="https://play.google.com/store/apps/details?id=com.groundupworks.partyphotobooth">Party PhotoBooth</a>, and has helped us publish photos reliably and efficiently over the years. We are now open-sourcing it because posting a photo should be easy, while integrating with native SDKs of the ever-growing number of service providers is anything but easy... so we hope Wings will take care of that part for you, and should you find yourself building new endpoints, make a pull request and add to the list!</p>
 
 <h2>
-<a id="adding-wings-to-your-project" class="anchor" href="#adding-wings-to-your-project" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding Wings to your project</h2>
+<a id="adding-wings-to-your-project" class="anchor" href="#adding-wings-to-your-project" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Adding Wings to your project</h2>
 
 <p>The Wings library builds multiple artifacts—the core <strong>wings.aar</strong> and an AAR per endpoint, such as <strong>wings-dropbox.aar</strong>. You will only need to include the core library and the endpoints applicable to your application. Assuming you are building with Gradle in Android Studio, start by adding the following dependencies to your application's <strong>build.gradle</strong>.</p>
 
-<pre><code>compile 'com.groundupworks.wings:wings:1.0.3'
-compile 'com.groundupworks.wings:wings-dropbox:1.0.3'  // For Dropbox
-compile 'com.groundupworks.wings:wings-facebook:1.0.3' // For Facebook
-compile 'com.groundupworks.wings:wings-gcp:1.0.3'      // For Google Drive or Cloud Print
+<pre><code>compile 'com.groundupworks.wings:wings:1.0.4'
+compile 'com.groundupworks.wings:wings-dropbox:1.0.4'  // For Dropbox
+compile 'com.groundupworks.wings:wings-facebook:1.0.4' // For Facebook
+compile 'com.groundupworks.wings:wings-gcp:1.0.4'      // For Google Drive or Cloud Print
 </code></pre>
 
 <h2>
-<a id="setting-up-the-endpoints" class="anchor" href="#setting-up-the-endpoints" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setting up the endpoints</h2>
+<a id="setting-up-the-endpoints" class="anchor" href="#setting-up-the-endpoints" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setting up the endpoints</h2>
 
 <p>You will find <strong>values/application.xml</strong> in some of the endpoint modules. This is where you specify credentials and configurations specific to your application. Take the Facebook endpoint for example, the following keys need to be overridden by your application.</p>
 
@@ -71,12 +71,12 @@ compile 'com.groundupworks.wings:wings-gcp:1.0.3'      // For Google Drive or Cl
 <p>The Dropbox endpoint will be <a href="https://www.dropbox.com/developers">a similar story</a>. The integration instructions from the service providers may ask you to add stuff to your <strong>AndroidManifest.xml</strong>, you can skip that when using Wings, because the endpoint AAR will take care of that for you by merging its manifest. All you need to do is override the values in each <strong>application.xml</strong>.</p>
 
 <h2>
-<a id="using-the-wings-apis" class="anchor" href="#using-the-wings-apis" aria-hidden="true"><span class="octicon octicon-link"></span></a>Using the Wings APIs</h2>
+<a id="using-the-wings-apis" class="anchor" href="#using-the-wings-apis" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Using the Wings APIs</h2>
 
 <p>Full documentation of the public API is available <a href="http://www.groundupworks.com/wings/docs/">here</a>, but the following sections will get you started.</p>
 
 <h3>
-<a id="initializing-wings" class="anchor" href="#initializing-wings" aria-hidden="true"><span class="octicon octicon-link"></span></a>Initializing Wings</h3>
+<a id="initializing-wings" class="anchor" href="#initializing-wings" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Initializing Wings</h3>
 
 <p>Wings need to be initialized in the <code>Application#onCreate()</code>.</p>
 
@@ -87,7 +87,7 @@ Wings.init(module, FacebookEndpoint.class, DropboxEndpoint.class, GoogleCloudPri
 <p>The <code>looper</code> is used to run background tasks and the <code>logger</code> implements <code>IWingsLogger</code>. All endpoint classes  used in your application should be passed to <code>Wings#init()</code>.</p>
 
 <h3>
-<a id="linking-a-user-account" class="anchor" href="#linking-a-user-account" aria-hidden="true"><span class="octicon octicon-link"></span></a>Linking a user account</h3>
+<a id="linking-a-user-account" class="anchor" href="#linking-a-user-account" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Linking a user account</h3>
 
 <p>To share to a user's account, the user will <em>link</em> with a sharing service, which means authenticating followed by authorizing the appropriate level of access, then specifying the destination for the shared content. All of this OAuth happiness, including UI, is handled by Wings. The application is responsible for initiating the linking process from an <code>Activity</code> or a <code>Fragment</code>, as in this Facebook example.</p>
 
@@ -103,7 +103,7 @@ Wings.init(module, FacebookEndpoint.class, DropboxEndpoint.class, GoogleCloudPri
 </code></pre>
 
 <h3>
-<a id="subscribing-to-a-link-state" class="anchor" href="#subscribing-to-a-link-state" aria-hidden="true"><span class="octicon octicon-link"></span></a>Subscribing to a link state</h3>
+<a id="subscribing-to-a-link-state" class="anchor" href="#subscribing-to-a-link-state" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Subscribing to a link state</h3>
 
 <p>Each endpoint emits its own <code>LinkEvent</code> to the <a href="http://square.github.io/otto/">Otto</a> <code>Bus</code>. A subscriber will receive the event at the time of subscription, and whenever the link state of that endpoint changes, until it unsubscribes.</p>
 
@@ -121,7 +121,7 @@ public void handleLinkEvent(DropboxEndpoint.LinkEvent event) {
 </code></pre>
 
 <h3>
-<a id="sharing-a-photo" class="anchor" href="#sharing-a-photo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sharing a photo</h3>
+<a id="sharing-a-photo" class="anchor" href="#sharing-a-photo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Sharing a photo</h3>
 
 <p>After confirming that a <code>WingsEndpoint#isLinked()</code>, you want to start sharing photos to that endpoint. This is done by calling <code>Wings#share()</code>, which internally creates a share request record in a database and triggers a background service to process that request. If the device has no connectivity at the moment, a retry will be scheduled according to a retry policy that waits longer and longer between subsequent retries should the request keep failing. The current implementation calculates retry intervals based on the Fibonacci sequence and gives up on records that has failed for more than two days.</p>
 
@@ -131,12 +131,12 @@ public void handleLinkEvent(DropboxEndpoint.LinkEvent event) {
 </code></pre>
 
 <h2>
-<a id="extending-wings" class="anchor" href="#extending-wings" aria-hidden="true"><span class="octicon octicon-link"></span></a>Extending Wings</h2>
+<a id="extending-wings" class="anchor" href="#extending-wings" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Extending Wings</h2>
 
 <p>If you intend to create a new endpoint, it'd probably be a good idea to fork the Git repo and add it to your project as source.</p>
 
 <h3>
-<a id="adding-wings-as-source" class="anchor" href="#adding-wings-as-source" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding Wings as source</h3>
+<a id="adding-wings-as-source" class="anchor" href="#adding-wings-as-source" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Adding Wings as source</h3>
 
 <p>Clone the Wings source.</p>
 
@@ -161,7 +161,7 @@ public void handleLinkEvent(DropboxEndpoint.LinkEvent event) {
 </code></pre>
 
 <h3>
-<a id="creating-a-new-endpoint" class="anchor" href="#creating-a-new-endpoint" aria-hidden="true"><span class="octicon octicon-link"></span></a>Creating a new endpoint</h3>
+<a id="creating-a-new-endpoint" class="anchor" href="#creating-a-new-endpoint" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Creating a new endpoint</h3>
 
 <p>To create a new endpoint, you need to implement a new <code>WingsEndpoint</code>. The best way to start is to look at how an existing endpoint implements all the interfaces. Once the new endpoint is created, remember to pass it to <code>Wings#init()</code> and consider submitting a pull request from your fork :)</p>
         </section>
