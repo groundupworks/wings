@@ -331,13 +331,13 @@ public class GoogleCloudPrintEndpoint extends WingsEndpoint {
         /**
          * The GCP print queue.
          */
-        public static final int PRINT_QUEUE = 0;
+        int PRINT_QUEUE = 0;
     }
 
     /**
      * The link event implementation associated with this endpoint.
      */
-    public class LinkEvent extends WingsEndpoint.LinkEvent {
+    public static class LinkEvent extends WingsEndpoint.LinkEvent {
 
         /**
          * Private constructor.

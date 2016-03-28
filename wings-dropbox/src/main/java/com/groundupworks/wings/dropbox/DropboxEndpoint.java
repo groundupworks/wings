@@ -465,13 +465,13 @@ public class DropboxEndpoint extends WingsEndpoint {
         /**
          * The Dropbox app folder.
          */
-        public static final int APP_FOLDER = 0;
+        int APP_FOLDER = 0;
     }
 
     /**
      * The link event implementation associated with this endpoint.
      */
-    public class LinkEvent extends WingsEndpoint.LinkEvent {
+    public static class LinkEvent extends WingsEndpoint.LinkEvent {
 
         /**
          * Private constructor.
