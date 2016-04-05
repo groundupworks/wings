@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Facebook Endpoint -->
+    <string name="wings_facebook__error_link">Błąd logowania Facebook</string>
+    <string name="wings_facebook__error_facebook_app">Aplikacja Facebook musi być zainstalowana</string>
+    <string name="wings_facebook__destination_profile_description">%1$s album Facebook %2$s</string>
+    <string name="wings_facebook__destination_page_description">Strona Facebook %1$s</string>
+    <string name="wings_facebook__destination_page_album_description">Album Facebook %1$s</string>
+    <string name="wings_facebook__destination_page_album_name_template">%1$s : %2$s</string>
+    <string name="wings_facebook__notification_shared_title">Udostępnij na Facebooku </string>
+    <string name="wings_facebook__notification_shared_msg_single">+1 zdjęcie do %1$s</string>
+    <string name="wings_facebook__notification_shared_msg_multi">+%1$d zdjęć do %2$s</string>
+    <string name="wings_facebook__notification_shared_ticker">Udostępnianie Facebook zakończone</string>
+
+    <!-- Facebook Login Activity -->
+    <string name="wings_facebook__login__label">Podłącz Facebook</string>
+
+    <!-- Facebook Settings Activity -->
+    <string name="wings_facebook__settings__label">Wybierz album</string>
+
+    <!-- Facebook Privacy Dialog Fragment -->
+    <string name="wings_facebook__privacy__dialog_title">Wybierz poziom dostępności</string>
+    <string name="wings_facebook__privacy__photo_privacy_self">Tylko ja</string>
+    <string name="wings_facebook__privacy__photo_privacy_friends">Znajomi</string>
+    <string name="wings_facebook__privacy__photo_privacy_friends_of_friends">Znajomi znajomych</string>
+    <string name="wings_facebook__privacy__photo_privacy_everyone">Publiczne</string>
+</resources>
