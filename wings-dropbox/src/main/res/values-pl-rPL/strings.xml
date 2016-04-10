@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wings_dropbox__error_link">Błąd łączenia z Dropboxem</string>
+    <string name="wings_dropbox__destination_description">%1$s Dropbox folder na %2$s</string>
+    <string name="wings_dropbox__notification_shared_title">Udostępnij na Dropboxie</string>
+    <string name="wings_dropbox__notification_shared_msg_single">+1 zdjęcie do %1$s</string>
+    <string name="wings_dropbox__notification_shared_msg_multi">+%1$d zdjęć do %2$s</string>
+    <string name="wings_dropbox__notification_shared_ticker">Udostępnianie Dropbox zakończone</string>
+</resources>
