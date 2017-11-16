@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!-- Override with values specific to your application -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Your app id from Facebook -->
-    <string name="wings_facebook__app_id">null</string>
+    <string name="wings_facebook__app_id" tools:ignore="MissingTranslation">null</string>
 
     <!-- The name of the default album to be created for storing photos -->
-    <string name="wings_facebook__app_album_default_name">null</string>
+    <string name="wings_facebook__app_album_default_name" tools:ignore="MissingTranslation">null</string>
 </resources>

@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!-- Override with values specific to your application -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Your app key from Dropbox -->
-    <string name="wings_dropbox__app_key">null</string>
-
-    <!-- Your app secret from Dropbox -->
-    <string name="wings_dropbox__app_secret">null</string>
+    <string name="wings_dropbox__app_key" tools:ignore="MissingTranslation">null</string>
 
     <!-- db- followed by your app key from Dropbox -->
-    <string name="wings_dropbox__app_scheme">null</string>
+    <string name="wings_dropbox__app_scheme" tools:ignore="MissingTranslation">null</string>
 
     <!-- The name of the folder to be created for storing photos -->
-    <string name="wings_dropbox__photo_folder">null</string>
+    <string name="wings_dropbox__photo_folder" tools:ignore="MissingTranslation">null</string>
 </resources>

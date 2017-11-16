@@ -1,5 +1,11 @@
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.dropbox.core:dropbox-core-sdk:3.0.5'
     compile 'com.googlecode.json-simple:json-simple:1.1'
     compile project(':wings')
+}
+
+android {
+    lintOptions {
+        disable 'InvalidPackage'
+    }
 }

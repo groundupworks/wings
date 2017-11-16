@@ -4,7 +4,7 @@
     <string name="wings_gcp__destination_description">%1$s\'s Google Cloud printer %2$s</string>
     <string name="wings_gcp__notification_shared_title">Google Cloud Print</string>
     <string name="wings_gcp__notification_shared_msg_single">+1 print job to %1$s</string>
-    <string name="wings_gcp__notification_shared_msg_multi">+%1$s print job to %2$s</string>
+    <string name="wings_gcp__notification_shared_msg_multi">+%1$d print job to %2$s</string>
     <string name="wings_gcp__notification_shared_ticker">Google Cloud print job queued</string>
 
     <!-- GCP Settings Activity -->
